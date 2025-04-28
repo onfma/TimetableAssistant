@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:controller="org.example.timetableassistant.constroller.MainController"
+            xmlns:fx="http://javafx.com/fxml" prefWidth="1200" prefHeight="800">
+
+    <!-- Top: Menu -->
+    <top>
+        <MenuBar>
+            <Menu text="File">
+                <MenuItem text="New" />
+                <MenuItem text="Exit" />
+            </Menu>
+            <Menu text="Help">
+                <MenuItem text="About" />
+            </Menu>
+        </MenuBar>
+    </top>
+
+    <!-- Left: Side Panel -->
+    <left>
+        <VBox>
+            <!-- Corrected padding format -->
+            <Label text="Add Event" styleClass="header-label"/>
+            <TextField fx:id="eventNameField" promptText="Event Name"/>
+            <TextField fx:id="eventTimeField" promptText="Time (e.g., 09:00)"/>
+            <Button text="Add Event" onAction="#handleAddEvent"/>
+        </VBox>
+    </left>
+
+    <!-- Center: Timetable Grid -->
+    <center>
+        <GridPane fx:id="timetableGrid" >
+            <!-- Dynamic content will be added in controller -->
+        </GridPane>
+    </center>
+
+</BorderPane>
