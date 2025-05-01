@@ -1,49 +1,52 @@
 package org.example.timetableassistant.database.handler;
+
 import com.google.gson.Gson;
 import org.example.timetableassistant.database.OperationResult;
-import org.example.timetableassistant.database.crud.ClassTypeCRUD;
+import org.example.timetableassistant.database.crud.RoomCRUD;
+import org.example.timetableassistant.database.crud.RoomTypesCRUD;
 import spark.Request;
 import spark.Response;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClassTypeHandler {
-    private static final ClassTypeCRUD classTypeCRUD = new ClassTypeCRUD();
+public class RoomTypesHandler {
+    private static final RoomTypesCRUD roomTypeCRUD = new RoomTypesCRUD();
 
-    public static String createClassType(Request req, Response res) {
+
+    public static String createRoomType(Request req, Response res) {
         String name = req.queryParams("name");
 
-        if (name == null) {
+        if (name == null || name.isEmpty()) {
             res.status(400);  // Bad Request
-            return "Missing required field (name).";
+            return "Missing required fields (name).";
         }
 
-        OperationResult result = classTypeCRUD.insertClassType(name);
+        OperationResult result = roomTypeCRUD.insertRoomType(name);
 
         if (result.success) {
-            res.status(201);
+            res.status(201);  // Created
             return "{\"message\":\"" + result.message + "\"}";
         } else {
-            res.status(500);
+            res.status(500);  // Internal Server Error
             return "{\"error\":\"" + result.message + "\"}";
         }
     }
 
-
-    public static String getClassTypeById(Request req, Response res) {
+    public static String getRoomTypeById(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
 
-        OperationResult result = classTypeCRUD.getClassTypeById(id);
+        OperationResult result = roomTypeCRUD.getRoomTypeById(id);
 
         Gson gson = new Gson();
 
         if (result.success) {
-            res.status(200);
+            res.status(200);  // OK
             Map<String, Object> response = new HashMap<>();
             response.put("message", result.message);
             return gson.toJson(response);
         } else {
-            res.status(404);
+            res.status(404);  // Not Found
             Map<String, Object> response = new HashMap<>();
             response.put("error", result.message);
             return gson.toJson(response);
@@ -51,38 +54,41 @@ public class ClassTypeHandler {
     }
 
 
-    public static String updateClassType(Request req, Response res) {
+    public static String updateRoomType(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         String newName = req.queryParams("name");
 
-        if (newName == null) {
+        if (newName == null || newName.isEmpty()) {
             res.status(400);  // Bad Request
-            return "Missing required field (name).";
+            return "Missing required fields (name).";
         }
 
-        OperationResult result = classTypeCRUD.updateClassType(id, newName);
+        OperationResult result = roomTypeCRUD.updateRoomType(id, newName);
 
         if (result.success) {
-            res.status(201);
+            res.status(200);  // OK
             return "{\"message\":\"" + result.message + "\"}";
         } else {
-            res.status(500);
+            res.status(500);  // Internal Server Error
             return "{\"error\":\"" + result.message + "\"}";
         }
     }
 
 
-    public static String deleteClassType(Request req, Response res) {
+    public static String deleteRoomType(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
 
-        OperationResult result = classTypeCRUD.deleteClassType(id);
+        OperationResult result = roomTypeCRUD.deleteRoomType(id);
 
         if (result.success) {
-            res.status(201);
+            res.status(200);  // OK
             return "{\"message\":\"" + result.message + "\"}";
         } else {
-            res.status(500);
+            res.status(500);  // Internal Server Error
             return "{\"error\":\"" + result.message + "\"}";
         }
     }
+
+
+
 }

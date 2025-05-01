@@ -41,14 +41,29 @@ public class DatabaseSetup {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement stmt = conn.createStatement()) {
 
+            String createSemiYears = """
+                CREATE TABLE IF NOT EXISTS semiyears (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(2) NOT NULL,           -- A, B, E
+                    study_year INT NOT NULL             -- 1, 2, 3
+                );
+            """;
+
+            String createGroups = """
+                CREATE TABLE IF NOT EXISTS groups (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(10) NOT NULL,           -- A1, A2, B1...
+                    semiyear_id INT REFERENCES semiyears(id)
+                );
+                """;
+
             String createStudents = """
                 CREATE TABLE IF NOT EXISTS students (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(100) NOT NULL,
-                    study_year INT NOT NULL,
-                    group_name VARCHAR(10) NOT NULL
+                    group_id INT REFERENCES groups(id)
                 );
-                """;
+            """;
 
             String createTeachers = """
                 CREATE TABLE IF NOT EXISTS teachers (
@@ -60,8 +75,7 @@ public class DatabaseSetup {
             String createDisciplines = """
                 CREATE TABLE IF NOT EXISTS disciplines (
                     id SERIAL PRIMARY KEY,
-                    name VARCHAR(100) NOT NULL,
-                    teacher_id INT REFERENCES teachers(id)
+                    name VARCHAR(100) NOT NULL
                 );
                 """;
 
@@ -72,14 +86,33 @@ public class DatabaseSetup {
                 );
                 """;
 
+            String createDisciplineAllocations = """
+                    CREATE TABLE IF NOT EXISTS discipline_allocations (
+                        id SERIAL PRIMARY KEY,
+                        discipline_id INT REFERENCES disciplines(id),
+                        teacher_id INT REFERENCES teachers(id),
+                        class_type_id INT REFERENCES class_types(id),
+                        hours_per_week INT NOT NULL
+                    );           
+                    """;
+
+            String createRoomTypes = """
+                CREATE TABLE IF NOT EXISTS room_types (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(20) NOT NULL UNIQUE,
+                    CHECK (name IN ('curs', 'seminar', 'laborator'))
+                );
+                """;
+
             String createRooms = """
                 CREATE TABLE IF NOT EXISTS rooms (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(50) NOT NULL,
                     capacity INT NOT NULL,
-                    type VARCHAR(20) NOT NULL
+                    room_type_id INT REFERENCES room_types(id)
                 );
                 """;
+
 
             String createTimeSlots = """
                 CREATE TABLE IF NOT EXISTS time_slots (
@@ -97,16 +130,24 @@ public class DatabaseSetup {
                     class_type_id INT REFERENCES class_types(id),
                     room_id INT REFERENCES rooms(id),
                     time_slot_id INT REFERENCES time_slots(id),
-                    study_year INT,
-                    group_name VARCHAR(10),
-                    teacher_id INT REFERENCES teachers(id)
+                    teacher_id INT REFERENCES teachers(id),
+                    semiyear_id INT REFERENCES semiyears(id),
+                    group_id INT REFERENCES groups(id),
+                    CHECK (
+                        (class_type_id = 1 AND semiyear_id IS NOT NULL AND group_id IS NULL) OR  -- curs
+                        (class_type_id IN (2, 3) AND group_id IS NOT NULL AND semiyear_id IS NULL) -- sem/lab
+                    )
                 );
-                """;
+            """;
 
+            stmt.execute(createSemiYears);
+            stmt.execute(createGroups);
             stmt.execute(createStudents);
             stmt.execute(createTeachers);
             stmt.execute(createDisciplines);
             stmt.execute(createClassTypes);
+            stmt.execute(createDisciplineAllocations);
+            stmt.execute(createRoomTypes);
             stmt.execute(createRooms);
             stmt.execute(createTimeSlots);
             stmt.execute(createClasses);

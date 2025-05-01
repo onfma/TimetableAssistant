@@ -13,14 +13,13 @@ public class DisciplineHandler {
 
     public static String createDiscipline(Request req, Response res) {
         String name = req.queryParams("name");
-        int teacherId = Integer.parseInt(req.queryParams("teacher_id"));
 
-        if (name == null || teacherId == 0) {
+        if (name == null || name.isEmpty()) {
             res.status(400);  // Bad Request
-            return "Missing required fields (name, teacher_id).";
+            return "Missing required fields (name).";
         }
 
-        OperationResult result = disciplineCRUD.insertDiscipline(name, teacherId);
+        OperationResult result = disciplineCRUD.insertDiscipline(name);
 
         if (result.success) {
             res.status(201);
@@ -30,6 +29,7 @@ public class DisciplineHandler {
             return "{\"error\":\"" + result.message + "\"}";
         }
     }
+
 
 
     public static String getDisciplineById(Request req, Response res) {
@@ -55,14 +55,13 @@ public class DisciplineHandler {
     public static String updateDiscipline(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         String newName = req.queryParams("name");
-        int newTeacherId = Integer.parseInt(req.queryParams("teacher_id"));
 
-        if (newName == null || newTeacherId == 0) {
+        if (newName == null || newName.isEmpty()) {
             res.status(400);  // Bad Request
-            return "Missing required fields (name, teacher_id).";
+            return "Missing required fields (name).";
         }
 
-        OperationResult result = disciplineCRUD.updateDiscipline(id, newName, newTeacherId);
+        OperationResult result = disciplineCRUD.updateDiscipline(id, newName);
 
         if (result.success) {
             res.status(200);

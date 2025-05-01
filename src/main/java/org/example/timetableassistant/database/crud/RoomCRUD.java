@@ -12,19 +12,20 @@ public class RoomCRUD {
     private static final String PASSWORD = DatabaseConfig.getPassword();
 
 
-    public OperationResult insertRoom(String name, int capacity, String type) {
-        String query = "INSERT INTO rooms (name, capacity, type) VALUES (?, ?, ?)";
+    public OperationResult insertRoom(String name, int capacity, int roomTypeId) {
+        String query = "INSERT INTO rooms (name, capacity, room_type_id) VALUES (?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, name);
             stmt.setInt(2, capacity);
-            stmt.setString(3, type);
+            stmt.setInt(3, roomTypeId); // Folosim room_type_id in loc de type
             stmt.executeUpdate();
             return new OperationResult(true, "Camera a fost adăugată cu succes.");
         } catch (SQLException e) {
             return new OperationResult(false, "Eroare la inserarea camerei: " + e.getMessage());
         }
     }
+
 
 
     public OperationResult getRoomById(int id) {
@@ -38,7 +39,7 @@ public class RoomCRUD {
                 data.put("id", rs.getInt("id"));
                 data.put("name", rs.getString("name"));
                 data.put("capacity", rs.getInt("capacity"));
-                data.put("type", rs.getString("type"));
+                data.put("room_type_id", rs.getInt("room_type_id")); // Folosim room_type_id
                 return new OperationResult(true, data);
             } else {
                 return new OperationResult(false, "Camera cu ID-ul " + id + " nu a fost găsită.");
@@ -49,13 +50,14 @@ public class RoomCRUD {
     }
 
 
-    public OperationResult updateRoom(int id, String newName, int newCapacity, String newType) {
-        String query = "UPDATE rooms SET name = ?, capacity = ?, type = ? WHERE id = ?";
+
+    public OperationResult updateRoom(int id, String newName, int newCapacity, int newRoomTypeId) {
+        String query = "UPDATE rooms SET name = ?, capacity = ?, room_type_id = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, newName);
             stmt.setInt(2, newCapacity);
-            stmt.setString(3, newType);
+            stmt.setInt(3, newRoomTypeId); // Folosim room_type_id in loc de type
             stmt.setInt(4, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -67,6 +69,7 @@ public class RoomCRUD {
             return new OperationResult(false, "Eroare la actualizarea camerei: " + e.getMessage());
         }
     }
+
 
 
     public OperationResult deleteRoom(int id) {

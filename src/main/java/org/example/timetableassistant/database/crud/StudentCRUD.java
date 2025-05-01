@@ -10,14 +10,12 @@ public class StudentCRUD {
     private static final String USER = DatabaseConfig.getUser();
     private static final String PASSWORD = DatabaseConfig.getPassword();
 
-
-    public OperationResult insertStudent(String name, int studyYear, String groupName) {
-        String query = "INSERT INTO students (name, study_year, group_name) VALUES (?, ?, ?)";
+    public OperationResult insertStudent(String name, int groupId) {
+        String query = "INSERT INTO students (name, group_id) VALUES (?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, name);
-            stmt.setInt(2, studyYear);
-            stmt.setString(3, groupName);
+            stmt.setInt(2, groupId);
             stmt.executeUpdate();
             return new OperationResult(true, "Studentul a fost adăugat cu succes.");
         } catch (SQLException e) {
@@ -26,7 +24,8 @@ public class StudentCRUD {
     }
 
     public OperationResult getStudentById(int id) {
-        String query = "SELECT * FROM students WHERE id = ?";
+        String query = "SELECT s.id, s.name, s.group_id " +
+                "FROM students s WHERE s.id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
@@ -35,8 +34,7 @@ public class StudentCRUD {
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("id", rs.getInt("id"));
                 data.put("name", rs.getString("name"));
-                data.put("study_year", rs.getInt("study_year"));
-                data.put("group_name", rs.getString("group_name"));
+                data.put("group_id", rs.getInt("group_id"));
                 return new OperationResult(true, data);
             } else {
                 return new OperationResult(false, "Studentul cu ID-ul " + id + " nu a fost găsit.");
@@ -46,15 +44,13 @@ public class StudentCRUD {
         }
     }
 
-
-    public OperationResult updateStudent(int id, String newName, int newStudyYear, String newGroupName) {
-        String query = "UPDATE students SET name = ?, study_year = ?, group_name = ? WHERE id = ?";
+    public OperationResult updateStudent(int id, String newName, int newGroupId) {
+        String query = "UPDATE students SET name = ?, group_id = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, newName);
-            stmt.setInt(2, newStudyYear);
-            stmt.setString(3, newGroupName);
-            stmt.setInt(4, id);
+            stmt.setInt(2, newGroupId);
+            stmt.setInt(3, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 return new OperationResult(true, "Studentul a fost actualizat cu succes.");
@@ -65,7 +61,6 @@ public class StudentCRUD {
             return new OperationResult(false, "Eroare la actualizarea studentului: " + e.getMessage());
         }
     }
-
 
     public OperationResult deleteStudent(int id) {
         String query = "DELETE FROM students WHERE id = ?";
@@ -83,12 +78,12 @@ public class StudentCRUD {
         }
     }
 
-
-    public OperationResult getStudentsByGroup(String groupName) {
-        String query = "SELECT * FROM students WHERE group_name = ?";
+    public OperationResult getStudentsByGroupId(int groupId) {
+        String query = "SELECT s.id, s.name, s.group_id " +
+                "FROM students s WHERE s.group_id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, groupName);
+            stmt.setInt(1, groupId);
             ResultSet rs = stmt.executeQuery();
             HashMap<Integer, HashMap<String, Object>> students = new HashMap<>();
             int count = 1;
@@ -96,15 +91,16 @@ public class StudentCRUD {
                 HashMap<String, Object> studentData = new HashMap<>();
                 studentData.put("id", rs.getInt("id"));
                 studentData.put("name", rs.getString("name"));
-                studentData.put("study_year", rs.getInt("study_year"));
-                studentData.put("group_name", rs.getString("group_name"));
+                studentData.put("group_id", rs.getInt("group_id"));
                 students.put(count++, studentData);
             }
             return students.isEmpty() ?
-                    new OperationResult(false, "Nu au fost găsiți studenți în grupul " + groupName) :
+                    new OperationResult(false, "Nu au fost găsiți studenți în grupa cu ID-ul " + groupId) :
                     new OperationResult(true, students);
         } catch (SQLException e) {
-            return new OperationResult(false, "Eroare la obținerea studenților: " + e.getMessage());
+            return new OperationResult(false, "Eroare la obținerea studenților după group_id: " + e.getMessage());
         }
     }
+
+
 }

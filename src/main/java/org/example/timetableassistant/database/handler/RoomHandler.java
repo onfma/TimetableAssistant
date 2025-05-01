@@ -14,14 +14,14 @@ public class RoomHandler {
     public static String createRoom(Request req, Response res) {
         String name = req.queryParams("name");
         int capacity = Integer.parseInt(req.queryParams("capacity"));
-        String type = req.queryParams("type");
+        int roomTypeId = Integer.parseInt(req.queryParams("room_type_id"));
 
-        if (name == null || type == null) {
+        if (name == null || roomTypeId <= 0) {
             res.status(400);  // Bad Request
-            return "Missing required fields (name, capacity, type).";
+            return "Missing required fields (name, capacity, room_type_id).";
         }
 
-        OperationResult result = roomCRUD.insertRoom(name, capacity, type);
+        OperationResult result = roomCRUD.insertRoom(name, capacity, roomTypeId);
 
         if (result.success) {
             res.status(201);  // Created
@@ -31,6 +31,7 @@ public class RoomHandler {
             return "{\"error\":\"" + result.message + "\"}";
         }
     }
+
 
     public static String getRoomById(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
@@ -55,14 +56,14 @@ public class RoomHandler {
         int id = Integer.parseInt(req.params(":id"));
         String newName = req.queryParams("name");
         int newCapacity = Integer.parseInt(req.queryParams("capacity"));
-        String newType = req.queryParams("type");
+        int newRoomTypeId = Integer.parseInt(req.queryParams("room_type_id"));
 
-        if (newName == null || newType == null) {
+        if (newName == null || newRoomTypeId <= 0) {
             res.status(400);  // Bad Request
-            return "Missing required fields (name, capacity, type).";
+            return "Missing required fields (name, capacity, room_type_id).";
         }
 
-        OperationResult result = roomCRUD.updateRoom(id, newName, newCapacity, newType);
+        OperationResult result = roomCRUD.updateRoom(id, newName, newCapacity, newRoomTypeId);
 
         if (result.success) {
             res.status(200);  // OK
@@ -72,6 +73,7 @@ public class RoomHandler {
             return "{\"error\":\"" + result.message + "\"}";
         }
     }
+
 
     public static String deleteRoom(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));

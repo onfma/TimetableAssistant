@@ -10,12 +10,11 @@ public class DisciplineCRUD {
     private static final String USER = DatabaseConfig.getUser();
     private static final String PASSWORD = DatabaseConfig.getPassword();
 
-    public OperationResult insertDiscipline(String name, int teacherId) {
-        String query = "INSERT INTO disciplines (name, teacher_id) VALUES (?, ?)";
+    public OperationResult insertDiscipline(String name) {
+        String query = "INSERT INTO disciplines (name) VALUES (?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, name);
-            stmt.setInt(2, teacherId);
             stmt.executeUpdate();
             return new OperationResult(true, "Disciplină adăugată cu succes.");
         } catch (SQLException e) {
@@ -34,7 +33,6 @@ public class DisciplineCRUD {
                 HashMap<String, Object> data = new HashMap<>();
                 data.put("id", rs.getInt("id"));
                 data.put("name", rs.getString("name"));
-                data.put("teacher_id", rs.getInt("teacher_id"));
                 return new OperationResult(true, data);
             } else {
                 return new OperationResult(false, "Disciplină cu ID-ul " + id + " nu a fost găsită.");
@@ -45,12 +43,11 @@ public class DisciplineCRUD {
     }
 
 
-    public OperationResult updateDiscipline(int id, String newName, int newTeacherId) {
-        String query = "UPDATE disciplines SET name = ?, teacher_id = ? WHERE id = ?";
+    public OperationResult updateDiscipline(int id, String newName) {
+        String query = "UPDATE disciplines SET name = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, newName);
-            stmt.setInt(2, newTeacherId);
             stmt.setInt(3, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {

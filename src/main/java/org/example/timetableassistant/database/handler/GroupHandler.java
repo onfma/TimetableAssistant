@@ -1,26 +1,29 @@
 package org.example.timetableassistant.database.handler;
+
 import com.google.gson.Gson;
 import org.example.timetableassistant.database.OperationResult;
-import org.example.timetableassistant.database.crud.StudentCRUD;
+import org.example.timetableassistant.database.crud.GroupCRUD;
+import org.example.timetableassistant.database.crud.TeacherCRUD;
 import spark.Request;
 import spark.Response;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class StudentHandler {
-    private static final StudentCRUD studentCRUD = new StudentCRUD();
+public class GroupHandler {
+    private static final GroupCRUD groupCRUD = new GroupCRUD();
 
-    public static String createStudent(Request req, Response res) {
+    public static String createGroup(Request req, Response res) {
         String name = req.queryParams("name");
-        String groupIdStr = req.queryParams("group_id");
+        String semiyearIdStr = req.queryParams("semiyear_id");
 
-        if (name == null || groupIdStr == null) {
+        if (name == null || semiyearIdStr == null) {
             res.status(400);
-            return "{\"error\":\"Missing required fields (name, group_id).\"}";
+            return "{\"error\":\"Missing required fields (name, semiyear_id).\"}";
         }
 
-        int groupId = Integer.parseInt(groupIdStr);
-        OperationResult result = studentCRUD.insertStudent(name, groupId);
+        int semiyearId = Integer.parseInt(semiyearIdStr);
+        OperationResult result = groupCRUD.insertGroup(name, semiyearId);
 
         if (result.success) {
             res.status(201);
@@ -31,36 +34,36 @@ public class StudentHandler {
         }
     }
 
-    public static String getStudentById(Request req, Response res) {
+    public static String getGroupById(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
-        OperationResult result = studentCRUD.getStudentById(id);
+        OperationResult result = groupCRUD.getGroupById(id);
         Gson gson = new Gson();
 
         if (result.success) {
-            res.status(200);
+            res.status(200);  // OK
             Map<String, Object> response = new HashMap<>();
             response.put("message", result.message);
             return gson.toJson(response);
         } else {
-            res.status(404);
+            res.status(404);  // Not Found
             Map<String, Object> response = new HashMap<>();
             response.put("error", result.message);
             return gson.toJson(response);
         }
     }
 
-    public static String updateStudent(Request req, Response res) {
+    public static String updateGroup(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         String newName = req.queryParams("name");
-        String newGroupIdStr = req.queryParams("group_id");
+        String newSemiyearIdStr = req.queryParams("semiyear_id");
 
-        if (newName == null || newGroupIdStr == null) {
+        if (newName == null || newSemiyearIdStr == null) {
             res.status(400);
-            return "{\"error\":\"Missing required fields (name, group_id).\"}";
+            return "{\"error\":\"Missing required fields (name, semiyear_id).\"}";
         }
 
-        int newGroupId = Integer.parseInt(newGroupIdStr);
-        OperationResult result = studentCRUD.updateStudent(id, newName, newGroupId);
+        int newSemiyearId = Integer.parseInt(newSemiyearIdStr);
+        OperationResult result = groupCRUD.updateGroup(id, newName, newSemiyearId);
 
         if (result.success) {
             res.status(200);
@@ -71,9 +74,9 @@ public class StudentHandler {
         }
     }
 
-    public static String deleteStudent(Request req, Response res) {
+    public static String deleteGroup(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
-        OperationResult result = studentCRUD.deleteStudent(id);
+        OperationResult result = groupCRUD.deleteGroup(id);
 
         if (result.success) {
             res.status(200);
@@ -84,22 +87,27 @@ public class StudentHandler {
         }
     }
 
-    public static String getStudentsByGroupId(Request req, Response res) {
-        int groupId = Integer.parseInt(req.params(":group_id"));
-        OperationResult result = studentCRUD.getStudentsByGroupId(groupId);
+    public static String getGroupByName(Request req, Response res) {
+        String name = req.params(":name");
+
+        if (name == null) {
+            res.status(400);
+            return "{\"error\":\"Missing required field (name).\"}";
+        }
+
+        OperationResult result = groupCRUD.getGroupByName(name);
         Gson gson = new Gson();
 
         if (result.success) {
-            res.status(200);
+            res.status(200);  // OK
             Map<String, Object> response = new HashMap<>();
             response.put("message", result.message);
             return gson.toJson(response);
         } else {
-            res.status(404);
+            res.status(404);  // Not Found
             Map<String, Object> response = new HashMap<>();
             response.put("error", result.message);
             return gson.toJson(response);
         }
     }
-
 }
