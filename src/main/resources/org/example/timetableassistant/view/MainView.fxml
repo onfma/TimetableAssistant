@@ -3,38 +3,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane fx:controller="org.example.timetableassistant.constroller.MainController"
-            xmlns:fx="http://javafx.com/fxml" prefWidth="1200" prefHeight="800">
+<SplitPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.timetableassistant.controller.MainController"
+           orientation="HORIZONTAL" dividerPositions="0.2">
 
-    <!-- Top: Menu -->
-    <top>
-        <MenuBar>
-            <Menu text="File">
-                <MenuItem text="New" />
-                <MenuItem text="Exit" />
-            </Menu>
-            <Menu text="Help">
-                <MenuItem text="About" />
-            </Menu>
-        </MenuBar>
-    </top>
+    <VBox spacing="15" style="-fx-background-color: #f0f0f0;" alignment="TOP_CENTER" prefWidth="250">
+        <Label text="Timetable Assistant"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333;"
+               maxWidth="Infinity"
+               alignment="CENTER"/>
 
-    <!-- Left: Side Panel -->
-    <left>
-        <VBox>
-            <!-- Corrected padding format -->
-            <Label text="Add Event" styleClass="header-label"/>
-            <TextField fx:id="eventNameField" promptText="Event Name"/>
-            <TextField fx:id="eventTimeField" promptText="Time (e.g., 09:00)"/>
-            <Button text="Add Event" onAction="#handleAddEvent"/>
-        </VBox>
-    </left>
+        <Button fx:id="btnStudents" text="👨‍🎓 Grupe studenți" prefWidth="200"/>
+        <Button fx:id="btnTeachers" text="👩‍🏫 Profesori" prefWidth="200"/>
+        <Button fx:id="btnDisciplines" text="📚 Discipline" prefWidth="200"/>
+        <Button fx:id="btnRooms" text="🏠 Săli" prefWidth="200"/>
 
-    <!-- Center: Timetable Grid -->
-    <center>
-        <GridPane fx:id="timetableGrid" >
-            <!-- Dynamic content will be added in controller -->
-        </GridPane>
-    </center>
+        <Separator prefWidth="180"/>
 
-</BorderPane>
+        <Button fx:id="btnSchedule" text="📅 Orar" prefWidth="200"/>
+        <Button fx:id="btnExport" text="📤 Export" prefWidth="200"/>
+
+        <padding>
+            <Insets top="20" left="10" right="10" bottom="10"/>
+        </padding>
+    </VBox>
+
+    <StackPane fx:id="mainContent" style="-fx-background-color: white;"/>
+</SplitPane>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.timetableassistant.controller.TeachersViewController"
+      spacing="15" alignment="CENTER">
+
+    <Label text="Profesori" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="teacherTable" prefHeight="200" prefWidth="300">
+        <columns>
+            <TableColumn fx:id="teacherNameColumn" text="Nume Profesor" prefWidth="150"/>
+            <TableColumn fx:id="disciplinesColumn" text="Discipline" prefWidth="150"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10">
+        <Button fx:id="addButton" text="Adaugă"/>
+        <Button fx:id="editButton" text="Editează"/>
+        <Button fx:id="deleteButton" text="Șterge"/>
+    </HBox>
+
+    <padding>
+        <Insets top="20" left="10" right="10" bottom="10"/>
+    </padding>
+</VBox>
