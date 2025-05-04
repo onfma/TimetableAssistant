@@ -5,6 +5,9 @@ module org.example.timetableassistant {
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
+    requires java.sql;
+    requires com.google.gson;
+    requires spark.core;
 
     opens org.example.timetableassistant to javafx.fxml;
     exports org.example.timetableassistant;
