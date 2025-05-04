@@ -14,7 +14,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/timetableassistant/view/MainView.fxml"));
         Scene scene = new Scene(loader.load(), 1200, 800);
-//        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("org/example/timetableassistant/style/style.css")).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/org/example/timetableassistant/style/style.css")).toExternalForm());
         primaryStage.setTitle("Timetable Assistant");
         primaryStage.setScene(scene);
         primaryStage.show();
