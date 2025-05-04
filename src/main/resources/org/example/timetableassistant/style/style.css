@@ -1,0 +1,12 @@
+.header-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.event-label {
+    -fx-background-color: lightblue;
+    -fx-padding: 5;
+    -fx-border-color: darkblue;
+    -fx-border-width: 1;
+    -fx-alignment: center;
+}

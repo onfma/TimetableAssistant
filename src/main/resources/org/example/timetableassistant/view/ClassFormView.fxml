@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.timetableassistant.controller.ClassFormController"
+      spacing="10" alignment="CENTER_LEFT" prefWidth="400">
+
+    <padding>
+        <Insets top="20" left="20" right="20" bottom="20"/>
+    </padding>
+
+    <Label fx:id="titleLabel" text="Adaugă Oră" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <ComboBox fx:id="groupComboBox" promptText="Selectează grupa"/>
+    <ComboBox fx:id="disciplineComboBox" promptText="Selectează disciplina"/>
+    <ComboBox fx:id="teacherComboBox" promptText="Selectează profesorul"/>
+    <ComboBox fx:id="roomComboBox" promptText="Selectează sala"/>
+    <ComboBox fx:id="timeSlotComboBox" promptText="Selectează intervalul orar"/>
+    <ComboBox fx:id="classTypeComboBox" promptText="Selectează tipul (C/S/L)"/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="cancelButton" text="Anulează"/>
+        <Button fx:id="saveButton" text="Salvează"/>
+    </HBox>
+</VBox>

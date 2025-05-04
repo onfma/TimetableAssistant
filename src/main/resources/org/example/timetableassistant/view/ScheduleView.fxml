@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.timetableassistant.controller.ScheduleViewController"
+      spacing="15" alignment="CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <Label text="Orar" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333333;" alignment="CENTER"/>
+
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <Label text="Filtrează după:"/>
+        <ComboBox fx:id="filterTypeComboBox" promptText="Selectează tipul" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="filterValueComboBox" promptText="Selectează valoarea" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <TableView fx:id="scheduleTable" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="dayColumn" text="Ziua" prefWidth="80"/>
+            <TableColumn fx:id="timeColumn" text="Interval" prefWidth="100"/>
+            <TableColumn fx:id="subjectColumn" text="Disciplina" prefWidth="120"/>
+            <TableColumn fx:id="teacherColumn" text="Profesor" prefWidth="150"/>
+            <TableColumn fx:id="roomColumn" text="Sală" prefWidth="80"/>
+            <TableColumn fx:id="groupColumn" text="Grupă" prefWidth="100"/>
+            <TableColumn fx:id="classTypeColumn" text="Tip" prefWidth="70"/>
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <Button fx:id="editButton" text="Editează Oră" onAction="#handleEditEntry"/>
+        <Button text="Adaugă clasă nouă" fx:id="openAddFormButton" onAction="#handleOpenAddForm" style="-fx-font-size: 14px; -fx-padding: 10px 20px;"/>
+    </HBox>
+
+</VBox>

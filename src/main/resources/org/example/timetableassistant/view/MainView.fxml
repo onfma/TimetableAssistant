@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<SplitPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="org.example.timetableassistant.controller.MainController"
+           orientation="HORIZONTAL" dividerPositions="0.2">
+
+    <VBox spacing="15" style="-fx-background-color: #f0f0f0;" alignment="TOP_CENTER" prefWidth="250">
+        <Label text="Timetable Assistant"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333333;"
+               maxWidth="Infinity"
+               alignment="CENTER"/>
+
+        <Button fx:id="btnStudents" text="👨‍🎓 Grupe studenți" prefWidth="200"/>
+        <Button fx:id="btnTeachers" text="👩‍🏫 Profesori" prefWidth="200"/>
+        <Button fx:id="btnDisciplines" text="📚 Discipline" prefWidth="200"/>
+        <Button fx:id="btnRooms" text="🏠 Săli" prefWidth="200"/>
+
+        <Separator prefWidth="180"/>
+
+        <Button fx:id="btnSchedule" text="📅 Orar" prefWidth="200"/>
+        <Button fx:id="btnExport" text="📤 Export" prefWidth="200"/>
+
+        <padding>
+            <Insets top="20" left="10" right="10" bottom="10"/>
+        </padding>
+    </VBox>
+
+    <StackPane fx:id="mainContent" style="-fx-background-color: white;"/>
+</SplitPane>
