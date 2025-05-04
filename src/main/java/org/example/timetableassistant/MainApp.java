@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.Objects;
+import java.io.IOException;
 
 public class MainApp extends Application {
 
@@ -20,6 +21,7 @@ public class MainApp extends Application {
     }
 
     public static void main(String[] args) {
+        DatabaseServer.startServer();
         launch(args);
     }
 }
