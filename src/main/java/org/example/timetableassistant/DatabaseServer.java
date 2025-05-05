@@ -10,6 +10,7 @@ public class DatabaseServer {
         path("/db", () -> {
             // TimeSlots Handlers
             post("/time-slot", (req, res) -> TimeSlotHandler.createTimeSlot(req, res));
+            get("/time-slot/get-all", (req, res) -> TimeSlotHandler.getAllTimeSlots(req, res));
             get("/time-slot/:id", (req, res) -> TimeSlotHandler.getTimeSlotById(req, res));
             put("/time-slot/:id", (req, res) -> TimeSlotHandler.updateTimeSlot(req, res));
             delete("/time-slot/:id", (req, res) -> TimeSlotHandler.deleteTimeSlot(req, res));
@@ -18,6 +19,7 @@ public class DatabaseServer {
             post("/class", (req, res) -> ClassHandler.createClass(req, res));
             put("/class/:id", (req, res) -> ClassHandler.updateClass(req, res));
             delete("/class/:id", (req, res) -> ClassHandler.deleteClass(req, res));
+            get("/class/get-all", (req, res) -> ClassHandler.getAllClasses(req, res));
             get("/class/:id", (req, res) -> ClassHandler.getClassById(req, res));
             get("/class/get-by-group-id/:groupId", (req, res) -> ClassHandler.getClassesByGroupId(req, res));
             get("/classes/get-by-room-id/:roomId", (req, res) -> ClassHandler.getClassesByRoomId(req, res));
@@ -27,12 +29,14 @@ public class DatabaseServer {
 
             // Discipline Handler
             post("/discipline", (req, res) -> DisciplineHandler.createDiscipline(req, res));
+            get("/discipline/get-all", (req, res) -> DisciplineHandler.getAllDisciplines(req, res));
             get("/discipline/:id", (req, res) -> DisciplineHandler.getDisciplineById(req, res));
             put("/discipline/:id", (req, res) -> DisciplineHandler.updateDiscipline(req, res));
             delete("/discipline/:id", (req, res) -> DisciplineHandler.deleteDiscipline(req, res));
 
             // Discipline Allocation Handler
             post("/discipline-allocation", (req, res) -> DisciplineAllocationHandler.createDisciplineAllocation(req, res));
+            get("/discipline-allocation/get-all", (req, res) -> DisciplineAllocationHandler.getAllDisciplineAllocations(req, res));
             get("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.getDisciplineAllocationById(req, res));
             put("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.updateDisciplineAllocation(req, res));
             delete("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.deleteDisciplineAllocation(req, res));
@@ -46,12 +50,14 @@ public class DatabaseServer {
 
             // Room Handler
             post("/room", (req, res) -> RoomHandler.createRoom(req, res));
+            get("/room/get-all", (req, res) -> RoomHandler.getAllRooms(req, res));
             get("/room/:id", (req, res) -> RoomHandler.getRoomById(req, res));
             put("/room/:id", (req, res) -> RoomHandler.updateRoom(req, res));
             delete("/room/:id", (req, res) -> RoomHandler.deleteRoom(req, res));
 
             // Student Handler
             post("/student", (req, res) -> StudentHandler.createStudent(req, res));
+            get("/student/get-all", (req, res) -> StudentHandler.getAllStudents(req, res));
             get("/student/get-by-id/:id", (req, res) -> StudentHandler.getStudentById(req, res));
             get("/student/get-by-group-id/:group_id", (req, res) -> StudentHandler.getStudentsByGroupId(req, res));
             put("/student/:id", (req, res) -> StudentHandler.updateStudent(req, res));
@@ -59,6 +65,7 @@ public class DatabaseServer {
 
             // Teacher Handler
             post("/teacher", (req, res) -> TeacherHandler.createTeacher(req, res));
+            get("/teacher/get-all", (req, res) -> TeacherHandler.getAllTeachers(req, res));
             get("/teacher/get-by-id/:id", (req, res) -> TeacherHandler.getTeacherById(req, res));
             get("/teacher/get-by-name/:name", (req, res) -> TeacherHandler.getTeacherByName(req, res));
             put("/teacher/:id", (req, res) -> TeacherHandler.updateTeacher(req, res));
@@ -66,17 +73,19 @@ public class DatabaseServer {
 
             // Semiyear routes
             post("/semiyear", SemiyearHandler::createSemiyear);
+            get("/semiyear/get-all", SemiyearHandler::getAllSemiyears);
             get("/semiyear/:id", SemiyearHandler::getSemiyearById);
             get("/semiyear/get-by-name", SemiyearHandler::getSemiyearByNameAndYear); // e.g. /semiyears/by?name=Sem1&study_year=1
             put("/semiyear/:id", SemiyearHandler::updateSemiyear);
             delete("/semiyear/:id", SemiyearHandler::deleteSemiyear);
 
             // Group routes
-            post("/create", GroupHandler::createGroup);
-            get("/:id", GroupHandler::getGroupById);
-            put("/:id", GroupHandler::updateGroup);
-            delete("/:id", GroupHandler::deleteGroup);
-            get("/name/:name", GroupHandler::getGroupByName);
+            post("/group", GroupHandler::createGroup);
+            get("/group/get-all", GroupHandler::getAllGroups);
+            get("/group/:id", GroupHandler::getGroupById);
+            put("/group/:id", GroupHandler::updateGroup);
+            delete("/group/:id", GroupHandler::deleteGroup);
+            get("/group/get-by-name/:name", GroupHandler::getGroupByName);
 
         });
 

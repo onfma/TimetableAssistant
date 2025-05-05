@@ -3,7 +3,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TeacherCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -42,6 +45,33 @@ public class TeacherCRUD {
             return new OperationResult(false, "Eroare la obținerea profesorului: " + e.getMessage());
         }
     }
+
+    public OperationResult getAllTeachers() {
+        String query = "SELECT * FROM teachers";
+        List<Map<String, Object>> teachers = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("name", rs.getString("name"));
+                teachers.add(data);
+            }
+
+            if (teachers.isEmpty()) {
+                return new OperationResult(false, "Nu există profesori în baza de date.");
+            }
+
+            return new OperationResult(true, teachers);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea profesorilor: " + e.getMessage());
+        }
+    }
+
 
 
     public OperationResult updateTeacher(int id, String newName) {

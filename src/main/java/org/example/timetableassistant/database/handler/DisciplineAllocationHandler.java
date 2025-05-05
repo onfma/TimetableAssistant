@@ -54,6 +54,23 @@ public class DisciplineAllocationHandler {
         }
     }
 
+    public static String getAllDisciplineAllocations(Request req, Response res) {
+        OperationResult result = disciplineAllocationCRUD.getAllDisciplineAllocations();
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+        return gson.toJson(response);
+    }
+
+
     public static String updateDisciplineAllocation(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         int newDisciplineId = Integer.parseInt(req.queryParams("discipline_id"));

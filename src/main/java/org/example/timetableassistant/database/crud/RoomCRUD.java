@@ -4,7 +4,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RoomCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -48,6 +51,35 @@ public class RoomCRUD {
             return new OperationResult(false, "Eroare la obținerea camerei: " + e.getMessage());
         }
     }
+
+    public OperationResult getAllRooms() {
+        String query = "SELECT * FROM rooms";
+        List<Map<String, Object>> rooms = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("name", rs.getString("name"));
+                data.put("capacity", rs.getInt("capacity"));
+                data.put("room_type_id", rs.getInt("room_type_id"));
+                rooms.add(data);
+            }
+
+            if (rooms.isEmpty()) {
+                return new OperationResult(false, "Nu există camere înregistrate.");
+            }
+
+            return new OperationResult(true, rooms);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea camerelor: " + e.getMessage());
+        }
+    }
+
 
 
 

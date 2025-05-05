@@ -4,7 +4,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DisciplineAllocationsCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -47,6 +50,36 @@ public class DisciplineAllocationsCRUD {
             return new OperationResult(false, "Eroare la obținerea alocării: " + e.getMessage());
         }
     }
+
+    public OperationResult getAllDisciplineAllocations() {
+        String query = "SELECT * FROM discipline_allocations";
+        List<Map<String, Object>> allocations = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("discipline_id", rs.getInt("discipline_id"));
+                data.put("teacher_id", rs.getInt("teacher_id"));
+                data.put("class_type_id", rs.getInt("class_type_id"));
+                data.put("hours_per_week", rs.getInt("hours_per_week"));
+                allocations.add(data);
+            }
+
+            if (allocations.isEmpty()) {
+                return new OperationResult(false, "Nu există alocări înregistrate.");
+            }
+
+            return new OperationResult(true, allocations);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea alocărilor: " + e.getMessage());
+        }
+    }
+
 
 
     public OperationResult updateDisciplineAllocation(int id, int newDisciplineId, int newTeacherId, int newClassTypeId, int newHoursPerWeek) {

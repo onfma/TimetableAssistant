@@ -107,7 +107,7 @@ public class ClassCRUD {
     }
 
 
-    // Delete a class by its ID
+
     public OperationResult deleteClass(int id) {
         String query = "DELETE FROM classes WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -180,7 +180,7 @@ public class ClassCRUD {
         }
     }
 
-    // Get all classes for a specific semiyear
+
     public OperationResult getClassesBySemiyearId(int semiyearId) {
         String query = "SELECT * FROM classes WHERE semiyear_id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -235,4 +235,36 @@ public class ClassCRUD {
             return new OperationResult(false, "Eroare la obținerea claselor pentru profesorul cu ID-ul " + teacherId + ": " + e.getMessage());
         }
     }
+
+    public OperationResult getAllClasses() {
+        String query = "SELECT * FROM classes";
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<Map<String, Object>> classes = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> classInfo = new HashMap<>();
+                classInfo.put("id", rs.getInt("id"));
+                classInfo.put("discipline_id", rs.getInt("discipline_id"));
+                classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
+                classInfo.put("room_id", rs.getInt("room_id"));
+                classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
+                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));  // poate fi null
+                classInfo.put("group_id", rs.getObject("group_id"));        // poate fi null
+                classInfo.put("teacher_id", rs.getInt("teacher_id"));
+                classes.add(classInfo);
+            }
+
+            return classes.isEmpty() ?
+                    new OperationResult(false, "Nu există clase înregistrate.") :
+                    new OperationResult(true, classes);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea claselor: " + e.getMessage());
+        }
+    }
+
+
 }

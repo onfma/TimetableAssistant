@@ -213,4 +213,21 @@ public class ClassHandler {
             return gson.toJson(response);
         }
     }
+
+    public static String getAllClasses(Request req, Response res) {
+        OperationResult result = classCRUD.getAllClasses();
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
 }
