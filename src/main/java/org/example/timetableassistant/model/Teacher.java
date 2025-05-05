@@ -1,13 +1,20 @@
 package org.example.timetableassistant.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Teacher {
     private int id;
     private String name;
-    private List<String> disciplines;
+    private List<Discipline> disciplines;
 
-    public Teacher(int id, String name, List<String> disciplines) {
+    public Teacher(int id, String name) {
+        this.id = id;
+        this.name = name;
+        this.disciplines = new ArrayList<>();
+    }
+
+    public Teacher(int id, String name, List<Discipline> disciplines) {
         this.id = id;
         this.name = name;
         this.disciplines = disciplines;
@@ -15,13 +22,15 @@ public class Teacher {
 
     public int getId() { return id; }
     public String getName() { return name; }
-    public List<String> getDisciplines() { return disciplines; }
-
-    public void setName(String name) { this.name = name; }
-    public void setDisciplines(List<String> disciplines) { this.disciplines = disciplines; }
-
-    @Override
-    public String toString() {
-        return name + " - " + String.join(", ", disciplines);
+    public List<String> getDisciplines() {
+        List<String> disciplineNames = new ArrayList<>();
+        for(Discipline discipline : disciplines) {
+            disciplineNames.add(discipline.getName());
+        };
+        return disciplineNames;
     }
+
+    public void setId(int id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void addDisciplines(List<Discipline> disciplines) { this.disciplines = disciplines; }
 }

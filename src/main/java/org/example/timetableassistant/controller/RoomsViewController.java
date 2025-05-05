@@ -161,13 +161,12 @@ public class RoomsViewController {
 
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
-                rooms.remove(selected);
                 String name = nameField.getText();
                 RoomType type = typeComboBox.getValue();
                 try {
                     roomService.editRoom(selected.getId(), name,  selected.getCapacity(), type.getId());
-                    Room newRoom = new Room(rooms.size() + 1, name, type.getName(), selected.getCapacity());
-                    return newRoom;
+                    selected.setName(name);
+                    selected.setType(type.getName());
                 } catch (Exception ex) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la adăugarea sălii: " + ex.getMessage());
                     errorAlert.showAndWait();

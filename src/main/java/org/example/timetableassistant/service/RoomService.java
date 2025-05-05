@@ -16,7 +16,8 @@ public class RoomService {
     private static final String BASE_URL = "http://localhost:4567/db/room";
 
     public static String createRoom(String name, int capacity, int type) throws Exception {
-        URL url = new URI(BASE_URL + "?name=" + name + "&capacity=" + capacity+ "&room_type_id=" + type).toURL();
+        String encodedName = java.net.URLEncoder.encode(name, "UTF-8");
+        URL url = new URI(BASE_URL + "?name=" + encodedName + "&capacity=" + capacity+ "&room_type_id=" + type).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
@@ -64,7 +65,8 @@ public class RoomService {
     }
 
     public String editRoom(int id, String name, int capacity, int type) throws Exception {
-        URL url = new URI(BASE_URL + "/" + id + "?name=" + name + "&capacity=" + capacity + "&room_type_id=" + type).toURL();
+        String encodedName = java.net.URLEncoder.encode(name, "UTF-8");
+        URL url = new URI(BASE_URL + "/" + id + "?name=" + encodedName + "&capacity=" + capacity + "&room_type_id=" + type).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("PUT");
         connection.setDoOutput(true);
