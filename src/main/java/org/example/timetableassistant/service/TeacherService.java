@@ -61,7 +61,7 @@ public class TeacherService {
     }
 
     public Teacher getTeacherById(int id) throws Exception{
-        URL url = new URI(BASE_URL + "//get-by-id/" + id).toURL();
+        URL url = new URI(BASE_URL + "/get-by-id/" + id).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
 

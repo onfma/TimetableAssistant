@@ -18,15 +18,14 @@ public class DisciplinesViewController {
     @FXML private Button deleteButton;
 
     private final ObservableList<Discipline> disciplines = FXCollections.observableArrayList();
+    private final DisciplineService disciplineService = new DisciplineService();
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         disciplineNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
-        disciplineTypeColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getType()));
 
         disciplines.addAll(
-                new Discipline(1, "Matematică", "seminar"),
-                new Discipline(2, "Chimie", "laborator")
+                disciplineService.getAllDisciplines()
         );
 
         disciplineTable.setItems(disciplines);
@@ -45,11 +44,7 @@ public class DisciplinesViewController {
         TextField nameField = new TextField();
         nameField.setPromptText("Introduceți numele disciplinei");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("seminar", "laborator");
-        typeComboBox.setPromptText("Selectați tipul");
-
-        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField, new Label("Tip disciplină:"), typeComboBox);
+        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField);
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -60,12 +55,9 @@ public class DisciplinesViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
-                int teacherId = 1;
                 try {
-                    DisciplineService.createDiscipline(name, teacherId);
-                    Discipline newDiscipline = new Discipline(disciplines.size() + 1, name, type);
-                    return newDiscipline;
+                    DisciplineService.createDiscipline(name);
+                    return new Discipline(disciplines.size() + 1, name);
                 } catch (Exception ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "Eroare la crearea disciplinei: " + ex.getMessage());
                     alert.showAndWait();
@@ -91,12 +83,7 @@ public class DisciplinesViewController {
         TextField nameField = new TextField(selected.getName());
         nameField.setPromptText("Modificați numele disciplinei");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("seminar", "laborator");
-        typeComboBox.setValue(selected.getType());
-        typeComboBox.setPromptText("Modificați tipul");
-
-        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField, new Label("Tip disciplină:"), typeComboBox);
+        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField);
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -107,10 +94,13 @@ public class DisciplinesViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
-                selected.setName(name);
-                selected.setType(type);
-                return selected;
+                try {
+                    DisciplineService.editDiscipline(selected.getId(), name);
+                    selected.setName(name);
+                    return selected;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
             return null;
         });
@@ -128,7 +118,13 @@ public class DisciplinesViewController {
                 ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
-                disciplines.remove(selected);
+                try {
+                    DisciplineService.deleteDiscipline(selected.getId());
+                    disciplines.remove(selected);
+                } catch (Exception e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea disciplinei: " + e.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
         });
     }
