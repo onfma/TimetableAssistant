@@ -39,10 +39,10 @@ public class DatabaseServer {
 
             // RoomType Handler
             post("/roomType", (req, res) -> RoomTypesHandler.createRoomType(req, res));
+            get("/roomType/get-all", (req, res) -> RoomTypesHandler.getAllRoomTypes(req, res));
             get("/roomType/:id", (req, res) -> RoomTypesHandler.getRoomTypeById(req, res));
             put("/roomType/:id", (req, res) -> RoomTypesHandler.updateRoomType(req, res));
             delete("/roomType/:id", (req, res) -> RoomTypesHandler.deleteRoomType(req, res));
-
 
             // Room Handler
             post("/room", (req, res) -> RoomHandler.createRoom(req, res));
@@ -65,11 +65,11 @@ public class DatabaseServer {
             delete("/teacher/:id", (req, res) -> TeacherHandler.deleteTeacher(req, res));
 
             // Semiyear routes
-            post("/create", SemiyearHandler::createSemiyear);
-            get("/id/:id", SemiyearHandler::getSemiyearById);
-            get("/by", SemiyearHandler::getSemiyearByNameAndYear); // e.g. /semiyears/by?name=Sem1&study_year=1
-            put("/update/:id", SemiyearHandler::updateSemiyear);
-            delete("/delete/:id", SemiyearHandler::deleteSemiyear);
+            post("/semiyear", SemiyearHandler::createSemiyear);
+            get("/semiyear/:id", SemiyearHandler::getSemiyearById);
+            get("/semiyear/get-by-name", SemiyearHandler::getSemiyearByNameAndYear); // e.g. /semiyears/by?name=Sem1&study_year=1
+            put("/semiyear/:id", SemiyearHandler::updateSemiyear);
+            delete("/semiyear/:id", SemiyearHandler::deleteSemiyear);
 
             // Group routes
             post("/create", GroupHandler::createGroup);
