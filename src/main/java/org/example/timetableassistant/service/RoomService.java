@@ -8,7 +8,7 @@ public class RoomService {
     private static final String BASE_URL = "http://localhost:4567/db/room";
 
     public static String createRoom(String name, int capacity, String type) throws Exception {
-        URL url = new URI(BASE_URL + "?name=" + name + "&capacity=" + capacity+ "&type=" + capacity).toURL();
+        URL url = new URI(BASE_URL + "?name=" + name + "&capacity=" + capacity+ "&type=" + type).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
