@@ -76,5 +76,19 @@ public class RoomService {
             throw new Exception("Failed to update room. HTTP error code: " + responseCode);
         }
     }
+
+    public String deleteRoom(int id) throws Exception {
+        URL url = new URI(BASE_URL + "/" + id).toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("DELETE");
+        connection.setDoOutput(true);
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            return "Room deleted successfully.";
+        } else {
+            throw new Exception("Failed to delete room. HTTP error code: " + responseCode);
+        }
+    }
     
 }

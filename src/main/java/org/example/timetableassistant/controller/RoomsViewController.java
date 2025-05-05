@@ -190,6 +190,12 @@ public class RoomsViewController {
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
                 rooms.remove(selected);
+                try {
+                    roomService.deleteRoom(selected.getId());
+                } catch (Exception ex) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea sălii: " + ex.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
         });
     }
