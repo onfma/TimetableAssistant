@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Room;
 import org.example.timetableassistant.model.RoomType;
+import org.example.timetableassistant.service.RoomService;
 import org.example.timetableassistant.service.RoomTypeService;
 
 public class RoomsViewController {
@@ -19,16 +20,19 @@ public class RoomsViewController {
     @FXML private Button deleteButton;
 
     private final ObservableList<Room> rooms = FXCollections.observableArrayList();
+    private final RoomTypeService roomTypeService = new RoomTypeService();
+    private final RoomService roomService = new RoomService();
+
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         roomNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
         roomTypeColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getType()));
 
-        //Example
         rooms.addAll(
-                new Room(1, "C101", "curs"),
-                new Room(2, "C102", "laborator")
+//                new Room(1, "C101", "curs"),
+//                new Room(2, "C102", "laborator")
+                roomService.getAllRooms()
         );
 
         roomsTable.setItems(rooms);
@@ -54,13 +58,8 @@ public class RoomsViewController {
         nameField.setPromptText("Sala");
 
         ComboBox<RoomType> typeComboBox = new ComboBox<>();
-        RoomTypeService roomTypeService = new RoomTypeService();
-//        String res = roomTypeService.createRoomTypes("RoomType-1");
-//        String res2 = roomTypeService.createRoomTypes("RoomType-2");
+
         java.util.List<RoomType> roomTypes = roomTypeService.getAllRoomTypes();
-        System.out.println("#############################################################");
-        System.out.println(roomTypes);
-        System.out.println("#############################################################");
         typeComboBox.getItems().addAll(roomTypes);
         typeComboBox.setPromptText("Selectați tipul");
 

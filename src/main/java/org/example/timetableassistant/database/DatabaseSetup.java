@@ -102,11 +102,6 @@ public class DatabaseSetup {
                     name VARCHAR(20) NOT NULL UNIQUE,
                     CHECK (name IN ('curs', 'seminar', 'laborator'))
                 );
-                INSERT INTO room_types (name) VALUES
-                ('curs'),
-                ('seminar'),
-                ('laborator')
-                ON CONFLICT (name) DO NOTHING;
                 """;
 
             String createRooms = """

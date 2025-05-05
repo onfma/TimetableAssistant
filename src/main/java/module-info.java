@@ -9,6 +9,7 @@ module org.example.timetableassistant {
     requires com.google.gson;
     requires spark.core;
     requires com.fasterxml.jackson.databind;
+    requires org.json;
 
     opens org.example.timetableassistant to javafx.fxml;
     opens org.example.timetableassistant.controller to javafx.fxml;

@@ -18,13 +18,13 @@ public class RoomTypeService {
             URL url = new URI(BASE_URL + "/get-all").toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-    
+
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream())) {
                     scanner.useDelimiter("\\A");
                     String json = scanner.hasNext() ? scanner.next() : "";
-    
+
                     ObjectMapper mapper = new ObjectMapper();
                     JsonNode root = mapper.readTree(json);
                     JsonNode messageNode = root.get("message");
@@ -56,17 +56,57 @@ public class RoomTypeService {
         }
     }
 
-    public String createRoomTypes(String name) throws Exception {
-        URL url = new URI(BASE_URL + "?name=" + name).toURL();
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
+    public RoomType getRoomTypeById(int id) {
+        try {
+            URL url = new URI(BASE_URL + "/" + id).toURL();
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
 
-        int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_CREATED) {
-            return "RoomType created successfully.";
-        } else {
-            throw new Exception("Failed to create room. HTTP error code: " + responseCode);
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream())) {
+                    scanner.useDelimiter("\\A");
+                    String json = scanner.hasNext() ? scanner.next() : "";
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode root = mapper.readTree(json);
+                    JsonNode messageNode = root.get("message");
+                    if (messageNode != null && messageNode.isObject()) {
+                        RoomType roomType = new RoomType();
+                        roomType.setName(messageNode.get("name").asText());
+                        // Set id if present
+                        if (messageNode.has("id")) {
+                            // RoomType class needs a setId method for this to work
+                            try {
+                                java.lang.reflect.Method setId = RoomType.class.getDeclaredMethod("setId", int.class);
+                                setId.invoke(roomType, messageNode.get("id").asInt());
+                            } catch (NoSuchMethodException e) {
+                                // Ignore if setter doesn't exist
+                            }
+                        }
+                        return roomType;
+                    }
+                }
+            } else {
+                throw new RuntimeException("Failed : HTTP error code : " + responseCode);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching room type by ID", e);
         }
+        return null;
     }
+
+//    public String createRoomTypes(String name) throws Exception {
+//        URL url = new URI(BASE_URL + "?name=" + name).toURL();
+//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//        connection.setRequestMethod("POST");
+//        connection.setDoOutput(true);
+//
+//        int responseCode = connection.getResponseCode();
+//        if (responseCode == HttpURLConnection.HTTP_CREATED) {
+//            return "RoomType created successfully.";
+//        } else {
+//            throw new Exception("Failed to create room. HTTP error code: " + responseCode);
+//        }
+//    }
 }
