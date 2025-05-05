@@ -8,6 +8,7 @@ module org.example.timetableassistant {
     requires java.sql;
     requires com.google.gson;
     requires spark.core;
+    requires com.fasterxml.jackson.databind;
 
     opens org.example.timetableassistant to javafx.fxml;
     opens org.example.timetableassistant.controller to javafx.fxml;

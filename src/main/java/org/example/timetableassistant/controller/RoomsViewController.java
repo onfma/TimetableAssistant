@@ -6,6 +6,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Room;
+import org.example.timetableassistant.model.RoomType;
+import org.example.timetableassistant.service.RoomTypeService;
 
 public class RoomsViewController {
 
@@ -31,12 +33,18 @@ public class RoomsViewController {
 
         roomsTable.setItems(rooms);
 
-        addButton.setOnAction(e -> handleAdd());
+        addButton.setOnAction(e -> {
+            try {
+                handleAdd();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
     }
 
-    private void handleAdd() {
+    private void handleAdd() throws Exception {
         Dialog<Room> dialog = new Dialog<>();
         dialog.setTitle("Add room");
 
@@ -45,15 +53,37 @@ public class RoomsViewController {
         TextField nameField = new TextField();
         nameField.setPromptText("Sala");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("curs", "laborator");
+        ComboBox<RoomType> typeComboBox = new ComboBox<>();
+        RoomTypeService roomTypeService = new RoomTypeService();
+//        String res = roomTypeService.createRoomTypes("RoomType-1");
+//        String res2 = roomTypeService.createRoomTypes("RoomType-2");
+        java.util.List<RoomType> roomTypes = roomTypeService.getAllRoomTypes();
+        System.out.println("#############################################################");
+        System.out.println(roomTypes);
+        System.out.println("#############################################################");
+        typeComboBox.getItems().addAll(roomTypes);
         typeComboBox.setPromptText("Selectați tipul");
+
+        typeComboBox.setCellFactory(cb -> new ListCell<RoomType>() {
+            @Override
+            protected void updateItem(RoomType item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
+        typeComboBox.setButtonCell(new ListCell<RoomType>() {
+            @Override
+            protected void updateItem(RoomType item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
 
         TextField capacityField = new TextField();
         capacityField.setPromptText("Capacitate");
 
         vbox.getChildren().addAll(
-            new Label("Nume sală:"), nameField, 
+            new Label("Nume sală:"), nameField,
             new Label("Tip sală:"), typeComboBox,
             new Label("Capacitate:"), capacityField
         );
@@ -67,13 +97,13 @@ public class RoomsViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
+                RoomType type = typeComboBox.getValue();
                 String capacityText = capacityField.getText();
                 int capacity;
                 try {
                     capacity = Integer.parseInt(capacityText);
-                    org.example.timetableassistant.service.RoomService.createRoom(name, capacity, type);
-                    Room newRoom = new Room(rooms.size() + 1, name, type);
+                    org.example.timetableassistant.service.RoomService.createRoom(name, capacity, type.getId());
+                    Room newRoom = new Room(rooms.size() + 1, name, type.getName());
                     return newRoom;
                 } catch (NumberFormatException nfe) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Capacitatea trebuie să fie un număr întreg.");
