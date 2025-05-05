@@ -4,7 +4,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SemiyearCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -44,6 +47,36 @@ public class SemiyearCRUD {
             return new OperationResult(false, "Eroare la obținerea semianului: " + e.getMessage());
         }
     }
+
+
+    public OperationResult getAllSemiyears() {
+        String query = "SELECT * FROM semiyears";
+        List<Map<String, Object>> semiyears = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("name", rs.getString("name"));
+                data.put("study_year", rs.getInt("study_year"));
+                semiyears.add(data);
+            }
+
+            if (semiyears.isEmpty()) {
+                return new OperationResult(false, "Nu există semiane înregistrate.");
+            }
+
+            return new OperationResult(true, semiyears);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea semianilor: " + e.getMessage());
+        }
+    }
+
+
 
     public OperationResult getSemiyearByNameAndYear(String name, int studyYear) {
         String query = "SELECT * FROM semiyears WHERE name = ? AND study_year = ?";
