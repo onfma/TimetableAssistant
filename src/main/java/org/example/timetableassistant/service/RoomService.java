@@ -1,7 +1,6 @@
 package org.example.timetableassistant.service;
 
 import org.example.timetableassistant.model.Room;
-import org.example.timetableassistant.service.RoomTypeService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -55,11 +54,26 @@ public class RoomService {
                 int typeId = roomObj.getInt("room_type_id");
                 RoomTypeService roomTypeService = new RoomTypeService();
                 String typeName = roomTypeService.getRoomTypeById(typeId).getName();
-                rooms.add(new Room(id, name, typeName));
+                int capacity = roomObj.getInt("capacity");
+                rooms.add(new Room(id, name, typeName, capacity));
             }
             return rooms;
         } else {
             throw new Exception("Failed to get rooms. HTTP error code: " + responseCode);
+        }
+    }
+
+    public String editRoom(int id, String name, int capacity, int type) throws Exception {
+        URL url = new URI(BASE_URL + "/" + id + "?name=" + name + "&capacity=" + capacity + "&room_type_id=" + type).toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("PUT");
+        connection.setDoOutput(true);
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            return "Room updated successfully.";
+        } else {
+            throw new Exception("Failed to update room. HTTP error code: " + responseCode);
         }
     }
     
