@@ -48,8 +48,7 @@ public class DisciplineService {
             JSONObject jsonResponse = new JSONObject(response.toString());
             Object message = jsonResponse.get("message");
 
-            if (message instanceof JSONArray) {
-                JSONArray disciplinesArray = (JSONArray) message;
+            if (message instanceof JSONArray disciplinesArray) {
                 for (int i = 0; i < disciplinesArray.length(); i++) {
                     JSONObject roomObj = disciplinesArray.getJSONObject(i);
                     int idDiscipline = roomObj.getInt("id");
@@ -58,8 +57,7 @@ public class DisciplineService {
                         return new Discipline(idDiscipline, name);
                     }
                 }
-            } else if (message instanceof JSONObject) {
-                JSONObject disciplineObj = (JSONObject) message;
+            } else if (message instanceof JSONObject disciplineObj) {
                 int idDiscipline = disciplineObj.getInt("id");
                 String name = disciplineObj.getString("name");
                 if (idDiscipline == id) {

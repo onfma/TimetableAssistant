@@ -63,8 +63,6 @@ public class TeachersViewController {
         removeDisciplineToTeacherButton.setOnAction(e -> handleRemoveDiscipline());
     }
 
-
-
     private void handleAdd() {
         Dialog<Teacher> dialog = new Dialog<>();
         dialog.setTitle("Adaugă profesor");
