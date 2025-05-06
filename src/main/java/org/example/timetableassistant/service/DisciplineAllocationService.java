@@ -69,4 +69,8 @@ public class DisciplineAllocationService {
             throw new Exception("Failed to get teachers. HTTP error code: " + responseCode);
         }
     }
+
+    public static List<DisciplineAllocation> getByTeacherId(int id) throws Exception {
+        return null;
+    }
 }

@@ -1,9 +1,12 @@
 package org.example.timetableassistant.model;
 
+import org.example.timetableassistant.database.crud.ClassType;
 import org.example.timetableassistant.service.DisciplineAllocationService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Teacher {
     private int id;
@@ -20,12 +23,10 @@ public class Teacher {
     public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
 
-    public List<String> getDisciplines() throws Exception {
-        List<String> disciplines = new ArrayList<>();
-        DisciplineAllocationService.getAllDisciplineAllocations().forEach(disciplineAllocation -> {
-            if (disciplineAllocation.getTeacher().getId() == this.id) {
-                disciplines.add(disciplineAllocation.getDiscipline().getName());
-            }
+    public Map<String, ClassType> getDisciplines() throws Exception {
+        Map<String, ClassType> disciplines = new HashMap<>();
+        DisciplineAllocationService.getByTeacherId(this.id).forEach(disciplineAllocation -> {
+            disciplines.put(disciplineAllocation.getDiscipline().getName(), disciplineAllocation.getClassType());
         });
         return disciplines;
     }
