@@ -23,11 +23,17 @@ public class Teacher {
     public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
 
-    public Map<String, ClassType> getDisciplines() throws Exception {
-        Map<String, ClassType> disciplines = new HashMap<>();
-        DisciplineAllocationService.getByTeacherId(this.id).forEach(disciplineAllocation -> {
-            disciplines.put(disciplineAllocation.getDiscipline().getName(), disciplineAllocation.getClassType());
-        });
+    public Map<String, List<ClassType>> getDisciplines() throws Exception {
+        Map<String, List<ClassType>> disciplines = new HashMap<>();
+        try {
+            List<DisciplineAllocation> allocations = DisciplineAllocationService.getByTeacherId(this.id);
+            allocations.forEach(disciplineAllocation -> {
+                disciplines.computeIfAbsent(disciplineAllocation.getDiscipline().getName(), k -> new ArrayList<>())
+                        .add(disciplineAllocation.getClassType());
+            });
+        } catch (Exception e) {
+            return disciplines;
+        }
         return disciplines;
     }
 }

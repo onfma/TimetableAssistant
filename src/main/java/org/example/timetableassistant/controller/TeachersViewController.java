@@ -6,16 +6,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.database.crud.ClassType;
-import org.example.timetableassistant.model.Discipline;
-import org.example.timetableassistant.model.Room;
-import org.example.timetableassistant.model.RoomType;
-import org.example.timetableassistant.model.Teacher;
+import org.example.timetableassistant.model.*;
 import org.example.timetableassistant.service.DisciplineAllocationService;
 import org.example.timetableassistant.service.DisciplineService;
 import org.example.timetableassistant.service.TeacherService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TeachersViewController {
 
@@ -37,11 +35,16 @@ public class TeachersViewController {
         teacherNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
         disciplinesColumn.setCellValueFactory(cell -> {
             try {
-                return new javafx.beans.property.SimpleStringProperty(String.join(", ", cell.getValue().getDisciplines()));
+                return new javafx.beans.property.SimpleStringProperty(
+                        cell.getValue().getDisciplines().entrySet().stream()
+                                .map(entry -> entry.getKey() + " " + entry.getValue())
+                                .collect(Collectors.joining(", "))
+                );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
+
 
         teachers.addAll(
                 teacherService.getAllTeachers()
