@@ -102,4 +102,22 @@ public class DisciplineAllocationService {
             throw new Exception("Failed to get teachers. HTTP error code: " + responseCode);
         }
     }
+
+    public static void deleteAllocation(int id) {
+        try {
+            URL url = new URI(BASE_URL + "/" + id).toURL();
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("DELETE");
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                System.out.println("Discipline Allocation deleted successfully.");
+            } else {
+                System.out.println("Failed to delete Discipline Allocation. HTTP error code: " + responseCode);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

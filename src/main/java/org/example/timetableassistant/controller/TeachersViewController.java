@@ -63,7 +63,13 @@ public class TeachersViewController {
                 throw new RuntimeException(ex);
             }
         });
-        removeDisciplineToTeacherButton.setOnAction(e -> handleRemoveDiscipline());
+        removeDisciplineToTeacherButton.setOnAction(e -> {
+            try {
+                handleRemoveDiscipline();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void handleAdd() {
@@ -248,7 +254,65 @@ public class TeachersViewController {
         });
     }
 
-    private void handleRemoveDiscipline() {
+    private void handleRemoveDiscipline() throws Exception {
+        Teacher selected = teacherTable.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
 
+        Dialog<Teacher> dialog = new Dialog<>();
+        dialog.setTitle("Sterge o asociere de materie a profesorului");
+
+        VBox vbox = new VBox(10);
+
+        ComboBox<DisciplineAllocation> allocationsBox = new ComboBox<>();
+        List<DisciplineAllocation> allocs = DisciplineAllocationService.getByTeacherId(selected.getId());
+        allocationsBox.getItems().addAll(allocs);
+        allocationsBox.setPromptText("Selectați asocierea");
+
+        allocationsBox.setCellFactory(cb -> new ListCell<DisciplineAllocation>() {
+            @Override
+            protected void updateItem(DisciplineAllocation item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getDiscipline().getName() + " - " + item.getClassType().name());
+            }
+        });
+        allocationsBox.setButtonCell(new ListCell<DisciplineAllocation>() {
+            @Override
+            protected void updateItem(DisciplineAllocation item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getDiscipline().getName() + " - " + item.getClassType().name());
+            }
+        });
+
+        vbox.getChildren().addAll(
+                new Label("Asociere:"), allocationsBox
+        );
+
+        dialog.getDialogPane().setContent(vbox);
+
+        ButtonType okButton = new ButtonType("Sterge", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Anulează", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, cancelButton);
+
+        dialog.setResultConverter(buttonType -> {
+            if (buttonType == okButton) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Ești sigur că vrei să ștergi asocierea?",
+                        ButtonType.YES, ButtonType.NO);
+                alert.showAndWait().ifPresent(type -> {
+                    if (type == ButtonType.YES) {
+                        try {
+                            DisciplineAllocationService.deleteAllocation(allocationsBox.getValue().getId());
+                        } catch (Exception ex) {
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea asocierii: " + ex.getMessage());
+                            errorAlert.showAndWait();
+                        }
+                    }
+                });
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(Room -> {
+            teacherTable.refresh();
+        });
     }
 }
