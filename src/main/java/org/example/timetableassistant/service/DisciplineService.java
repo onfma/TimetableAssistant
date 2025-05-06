@@ -1,9 +1,6 @@
 package org.example.timetableassistant.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.timetableassistant.model.Discipline;
-import org.example.timetableassistant.model.RoomType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -66,45 +63,33 @@ public class DisciplineService {
         return null;
     }
 
-    public List<Discipline> getAllDisciplines() throws Exception {
-        try {
-            URL url = new URI(BASE_URL + "/get-all").toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+    public static List<Discipline> getAllDisciplines() throws Exception {
+        URL url = new URI(BASE_URL + "/get-all").toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
 
-            int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                try (java.util.Scanner scanner = new java.util.Scanner(conn.getInputStream())) {
-                    scanner.useDelimiter("\\A");
-                    String json = scanner.hasNext() ? scanner.next() : "";
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode root = mapper.readTree(json);
-                    JsonNode messageNode = root.get("message");
-                    List<Discipline> disciplines = new ArrayList<>();
-                    if (messageNode != null && messageNode.isArray()) {
-                        for (JsonNode node : messageNode) {
-                            Discipline discipline = new Discipline();
-                            discipline.setName(node.get("name").asText());
-                            // Set id if present
-                            if (node.has("id")) {
-                                try {
-                                    java.lang.reflect.Method setId = Discipline.class.getDeclaredMethod("setId", int.class);
-                                    setId.invoke(discipline, node.get("id").asInt());
-                                } catch (NoSuchMethodException e) {
-                                    // Ignore if setter doesn't exist
-                                }
-                            }
-                            disciplines.add(discipline);
-                        }
-                    }
-                    return disciplines;
-                }
-            } else {
-                throw new RuntimeException("Failed : HTTP error code : " + responseCode);
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Error fetching disciplines", e);
+            in.close();
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            JSONArray disciplinesArray = jsonResponse.getJSONArray("message");
+            List<Discipline> disciplines = new ArrayList<>();
+            for (int i = 0; i < disciplinesArray.length(); i++) {
+                JSONObject disciplineObj = disciplinesArray.getJSONObject(i);
+                int id = disciplineObj.getInt("id");
+                String name = disciplineObj.getString("name");
+                disciplines.add(new Discipline(id, name));
+            }
+            return disciplines;
+        } else {
+            throw new Exception("Failed to get all disciplines. HTTP error code: " + responseCode);
         }
     }
 

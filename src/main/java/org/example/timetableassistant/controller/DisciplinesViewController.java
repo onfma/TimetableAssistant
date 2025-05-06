@@ -57,7 +57,7 @@ public class DisciplinesViewController {
                 String name = nameField.getText();
                 try {
                     DisciplineService.createDiscipline(name);
-                    return new Discipline(disciplines.size() + 1, name);
+                    return DisciplineService.getAllDisciplines().getLast();
                 } catch (Exception ex) {
                     Alert alert = new Alert(Alert.AlertType.ERROR, "Eroare la crearea disciplinei: " + ex.getMessage());
                     alert.showAndWait();
@@ -119,8 +119,13 @@ public class DisciplinesViewController {
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
                 try {
-                    DisciplineService.deleteDiscipline(selected.getId());
                     disciplines.remove(selected);
+                    System.out.println("################################################");
+                    System.out.println("################################################");
+                    System.out.println(selected.getId());
+                    System.out.println("################################################");
+                    System.out.println("################################################");
+                    DisciplineService.deleteDiscipline(selected.getId());
                 } catch (Exception e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea disciplinei: " + e.getMessage());
                     errorAlert.showAndWait();
