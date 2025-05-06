@@ -30,7 +30,7 @@ public class RoomService {
         }
     }
 
-    public List<Room> getAllRooms() throws Exception {
+    public static List<Room> getAllRooms() throws Exception {
         URL url = new URI(BASE_URL + "/get-all").toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

@@ -98,9 +98,8 @@ public class RoomsViewController {
                 int capacity;
                 try {
                     capacity = Integer.parseInt(capacityText);
-                    org.example.timetableassistant.service.RoomService.createRoom(name, capacity, type.getId());
-                    Room newRoom = new Room(rooms.size() + 1, name, type.getName(), capacity);
-                    return newRoom;
+                    RoomService.createRoom(name, capacity, type.getId());
+                    return RoomService.getAllRooms().getLast();
                 } catch (NumberFormatException nfe) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Capacitatea trebuie să fie un număr întreg.");
                     errorAlert.showAndWait();
