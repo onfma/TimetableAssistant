@@ -19,6 +19,8 @@
         <Button fx:id="addButton" text="Adaugă"/>
         <Button fx:id="editButton" text="Editează"/>
         <Button fx:id="deleteButton" text="Șterge"/>
+        <Button fx:id="addDisciplineToTeacherButton" text="Asociaza materie"/>
+        <Button fx:id="removeDisciplineToTeacherButton" text="Șterge materie asociata"/>
     </HBox>
 
     <padding>

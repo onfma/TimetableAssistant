@@ -1,5 +1,6 @@
 package org.example.timetableassistant.service;
 
+import org.example.timetableassistant.model.Discipline;
 import org.example.timetableassistant.model.Teacher;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -52,7 +53,8 @@ public class TeacherService {
                 JSONObject roomObj = teachersArray.getJSONObject(i);
                 int id = roomObj.getInt("id");
                 String name = roomObj.getString("name");
-                teachers.add(new Teacher(id, name));
+                Teacher newTeacher = new Teacher(id, name);
+                teachers.add(newTeacher);
             }
             return teachers;
         } else {
@@ -60,7 +62,7 @@ public class TeacherService {
         }
     }
 
-    public Teacher getTeacherById(int id) throws Exception{
+    public static Teacher getTeacherById(int id) throws Exception{
         URL url = new URI(BASE_URL + "/get-by-id/" + id).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -76,18 +78,32 @@ public class TeacherService {
             in.close();
 
             JSONObject jsonResponse = new JSONObject(response.toString());
-            JSONArray teachersArray = jsonResponse.getJSONArray("message");
-            List<Teacher> teachers = new ArrayList<>();
-            for (int i = 0; i < teachersArray.length(); i++) {
-                JSONObject roomObj = teachersArray.getJSONObject(i);
-                int idTeacher = roomObj.getInt("id");
-                String name = roomObj.getString("name");
-                teachers.add(new Teacher(idTeacher, name));
+            Object message = jsonResponse.get("message");
+
+            if (message instanceof JSONArray) {
+                JSONArray teachersArray = (JSONArray) message;
+                for (int i = 0; i < teachersArray.length(); i++) {
+                    JSONObject teacherObj = teachersArray.getJSONObject(i);
+                    int idTeacher = teacherObj.getInt("id");
+                    String name = teacherObj.getString("name");
+                    if (idTeacher == id) {
+                        return new Teacher(idTeacher, name);
+                    }
+                }
+            } else if (message instanceof JSONObject) {
+                JSONObject teacherObj = (JSONObject) message;
+                int idTeacher = teacherObj.getInt("id");
+                String name = teacherObj.getString("name");
+                if (idTeacher == id) {
+                    return new Teacher(idTeacher, name);
+                }
+            } else {
+                throw new Exception("Unexpected message format in response.");
             }
-            return teachers.get(0);
         } else {
             throw new Exception("Failed to get teacher. HTTP error code: " + responseCode);
         }
+        return null;
     }
 
     public String editTeacher(int id, String name) throws Exception{

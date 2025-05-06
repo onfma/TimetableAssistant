@@ -120,11 +120,6 @@ public class DisciplinesViewController {
             if (type == ButtonType.YES) {
                 try {
                     disciplines.remove(selected);
-                    System.out.println("################################################");
-                    System.out.println("################################################");
-                    System.out.println(selected.getId());
-                    System.out.println("################################################");
-                    System.out.println("################################################");
                     DisciplineService.deleteDiscipline(selected.getId());
                 } catch (Exception e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea disciplinei: " + e.getMessage());

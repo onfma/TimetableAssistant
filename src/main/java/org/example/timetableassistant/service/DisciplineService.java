@@ -30,7 +30,7 @@ public class DisciplineService {
         }
     }
 
-    public Discipline getDisciplineById(int id) throws Exception {
+    public static Discipline getDisciplineById(int id) throws Exception {
         URL url = new URI(BASE_URL + "/" + id).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -46,16 +46,27 @@ public class DisciplineService {
             in.close();
 
             JSONObject jsonResponse = new JSONObject(response.toString());
-            JSONArray disciplinesArray = jsonResponse.getJSONArray("message");
-            List<Discipline> disciplines = new ArrayList<>();
-            for (int i = 0; i < disciplinesArray.length(); i++) {
-                JSONObject roomObj = disciplinesArray.getJSONObject(i);
-                int idDiscipline = roomObj.getInt("id");
-                if (idDiscipline == id) {
-                    String name = roomObj.getString("name");
-                    disciplines.add(new Discipline(idDiscipline, name));
-                    return disciplines.getFirst();
+            Object message = jsonResponse.get("message");
+
+            if (message instanceof JSONArray) {
+                JSONArray disciplinesArray = (JSONArray) message;
+                for (int i = 0; i < disciplinesArray.length(); i++) {
+                    JSONObject roomObj = disciplinesArray.getJSONObject(i);
+                    int idDiscipline = roomObj.getInt("id");
+                    if (idDiscipline == id) {
+                        String name = roomObj.getString("name");
+                        return new Discipline(idDiscipline, name);
+                    }
                 }
+            } else if (message instanceof JSONObject) {
+                JSONObject disciplineObj = (JSONObject) message;
+                int idDiscipline = disciplineObj.getInt("id");
+                String name = disciplineObj.getString("name");
+                if (idDiscipline == id) {
+                    return new Discipline(idDiscipline, name);
+                }
+            } else {
+                throw new Exception("Unexpected message format in response.");
             }
         } else {
             throw new Exception("Failed to get discipline. HTTP error code: " + responseCode);
