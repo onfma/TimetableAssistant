@@ -78,7 +78,7 @@ public class DisciplineCRUD {
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, newName);
-            stmt.setInt(3, id);
+            stmt.setInt(2, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 return new OperationResult(true, "Disciplină actualizată cu succes.");
