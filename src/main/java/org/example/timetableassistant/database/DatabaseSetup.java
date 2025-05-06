@@ -91,7 +91,7 @@ public class DatabaseSetup {
                         id SERIAL PRIMARY KEY,
                         discipline_id INT REFERENCES disciplines(id),
                         teacher_id INT REFERENCES teachers(id),
-                        class_type_id INT REFERENCES class_types(id),
+                        class_type_id INT NOT NULL,
                         hours_per_week INT NOT NULL
                     );           
                     """;
