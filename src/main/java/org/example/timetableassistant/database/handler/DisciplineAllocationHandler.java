@@ -70,6 +70,31 @@ public class DisciplineAllocationHandler {
         return gson.toJson(response);
     }
 
+    public static String getAllDisciplineAllocationsByTeacherId(Request req, Response res) {
+        int teacherId;
+        try {
+            teacherId = Integer.parseInt(req.params(":id"));
+        } catch (NumberFormatException e) {
+            res.status(400);
+            return "{\"error\":\"ID invalid pentru profesor.\"}";
+        }
+
+        OperationResult result = disciplineAllocationCRUD.getAllDisciplineAllocationsByTeacherId(teacherId);
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
 
     public static String updateDisciplineAllocation(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
