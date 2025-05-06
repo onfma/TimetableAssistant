@@ -40,7 +40,10 @@ public class DisciplineAllocationsCRUD {
                 data.put("id", rs.getInt("id"));
                 data.put("discipline_id", rs.getInt("discipline_id"));
                 data.put("teacher_id", rs.getInt("teacher_id"));
-                data.put("class_type_id", rs.getInt("class_type_id"));
+
+                int classTypeId = rs.getInt("class_type_id");
+                data.put("class_type", ClassType.fromInt(classTypeId).name());  // Enum în loc de int
+
                 data.put("hours_per_week", rs.getInt("hours_per_week"));
                 return new OperationResult(true, data);
             } else {
@@ -50,6 +53,7 @@ public class DisciplineAllocationsCRUD {
             return new OperationResult(false, "Eroare la obținerea alocării: " + e.getMessage());
         }
     }
+
 
     public OperationResult getAllDisciplineAllocations() {
         String query = "SELECT * FROM discipline_allocations";
@@ -64,7 +68,10 @@ public class DisciplineAllocationsCRUD {
                 data.put("id", rs.getInt("id"));
                 data.put("discipline_id", rs.getInt("discipline_id"));
                 data.put("teacher_id", rs.getInt("teacher_id"));
-                data.put("class_type_id", rs.getInt("class_type_id"));
+
+                int classTypeId = rs.getInt("class_type_id");
+                data.put("class_type", ClassType.fromInt(classTypeId).name());  // Enum ca text
+
                 data.put("hours_per_week", rs.getInt("hours_per_week"));
                 allocations.add(data);
             }
@@ -79,6 +86,7 @@ public class DisciplineAllocationsCRUD {
             return new OperationResult(false, "Eroare la obținerea alocărilor: " + e.getMessage());
         }
     }
+
 
 
 
@@ -99,6 +107,41 @@ public class DisciplineAllocationsCRUD {
             }
         } catch (SQLException e) {
             return new OperationResult(false, "Eroare la actualizarea alocării: " + e.getMessage());
+        }
+    }
+
+
+    public OperationResult getAllDisciplineAllocationsByTeacherId(int teacherId) {
+        String query = "SELECT * FROM discipline_allocations WHERE teacher_id = ?";
+        List<Map<String, Object>> allocations = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, teacherId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("discipline_id", rs.getInt("discipline_id"));
+                data.put("teacher_id", rs.getInt("teacher_id"));
+
+                int classTypeId = rs.getInt("class_type_id");
+                data.put("class_type", ClassType.fromInt(classTypeId).name());  // Convertim din int în enum string
+
+                data.put("hours_per_week", rs.getInt("hours_per_week"));
+                allocations.add(data);
+            }
+
+            if (allocations.isEmpty()) {
+                return new OperationResult(false, "Nu există alocări pentru profesorul cu ID-ul " + teacherId + ".");
+            }
+
+            return new OperationResult(true, allocations);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea alocărilor pentru profesor: " + e.getMessage());
         }
     }
 
