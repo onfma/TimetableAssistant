@@ -165,9 +165,17 @@ public class TeachersViewController {
                 ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
-                teachers.remove(selected);
                 try {
+                    try {
+                        List<DisciplineAllocation> allocations = DisciplineAllocationService.getByTeacherId(selected.getId());
+                        for (DisciplineAllocation allocation : allocations) {
+                            DisciplineAllocationService.deleteAllocation(allocation.getId());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace(); // Handle the exception as needed, e.g., log it or show an alert
+                    }
                     teacherService.deleteTeacher(selected.getId());
+                    teachers.remove(selected);
                 } catch (Exception ex) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea profesorului: " + ex.getMessage());
                     errorAlert.showAndWait();
