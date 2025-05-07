@@ -31,7 +31,7 @@ public class TeacherService {
         }
     }
 
-    public List<Teacher> getAllTeachers() throws Exception{
+    public static List<Teacher> getAllTeachers() throws Exception{
         URL url = new URI(BASE_URL + "/get-all").toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

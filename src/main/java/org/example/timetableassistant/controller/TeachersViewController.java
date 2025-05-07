@@ -47,7 +47,7 @@ public class TeachersViewController {
 
 
         teachers.addAll(
-                teacherService.getAllTeachers()
+                TeacherService.getAllTeachers()
         );
 
         teacherTable.setItems(teachers);
@@ -72,6 +72,10 @@ public class TeachersViewController {
         });
     }
 
+    private void refreshTable() {
+        teacherTable.refresh();
+    }
+
     private void handleAdd() {
         Dialog<Teacher> dialog = new Dialog<>();
         dialog.setTitle("Adaugă profesor");
@@ -81,10 +85,9 @@ public class TeachersViewController {
         TextField nameField = new TextField();
         nameField.setPromptText("Introduceți numele profesorului");
 
-        TextField disciplinesField = new TextField();
-        disciplinesField.setPromptText("Introduceți disciplinele separate prin virgulă");
-
-        vbox.getChildren().addAll(new Label("Nume profesor:"), nameField, new Label("Discipline:"), disciplinesField);
+        vbox.getChildren().addAll(
+                new Label("Nume profesor:"), nameField
+        );
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -97,7 +100,7 @@ public class TeachersViewController {
                 String name = nameField.getText();
                 try {
                     TeacherService.createTeacher(name);
-                    return new Teacher(teachers.size() + 1, name);
+                    return TeacherService.getAllTeachers().getLast();
                 } catch (Exception ex) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la adăugarea profesorului: " + ex.getMessage());
                     errorAlert.showAndWait();
@@ -109,6 +112,7 @@ public class TeachersViewController {
         dialog.showAndWait().ifPresent(teacher -> {
             teachers.add(teacher);
         });
+        refreshTable();
     }
 
     private void handleEdit() {
@@ -122,9 +126,6 @@ public class TeachersViewController {
 
         TextField nameField = new TextField(selected.getName());
         nameField.setPromptText("Modificați numele profesorului");
-
-//        TextField disciplinesField = new TextField(String.join(", ", selected.getDisciplines()));
-//        disciplinesField.setPromptText("Modificați disciplinele separate prin virgulă");
 
         vbox.getChildren().addAll(new Label("Nume profesor:"), nameField);
 
@@ -152,6 +153,8 @@ public class TeachersViewController {
         dialog.showAndWait().ifPresent(teacher -> {
             teacherTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleDelete() {
@@ -171,6 +174,8 @@ public class TeachersViewController {
                 }
             }
         });
+
+        refreshTable();
     }
 
     private void handleAddDiscipline() throws Exception {
@@ -239,8 +244,6 @@ public class TeachersViewController {
                 ClassType classType = classTypeBox.getValue();
                 try {
                     DisciplineAllocationService.createDisciplineAllocation(discipline.getId(), selected.getId(), classType.getValue(), 1);
-
-//                    selected.addDiscipline(discipline, classType);
                 } catch (Exception ex) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la asocierea materiei cu profesorul: " + ex.getMessage());
                     errorAlert.showAndWait();
@@ -252,6 +255,8 @@ public class TeachersViewController {
         dialog.showAndWait().ifPresent(Room -> {
             teacherTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleRemoveDiscipline() throws Exception {
@@ -311,8 +316,6 @@ public class TeachersViewController {
             return null;
         });
 
-        dialog.showAndWait().ifPresent(Room -> {
-            teacherTable.refresh();
-        });
+        refreshTable();
     }
 }
