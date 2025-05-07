@@ -11,7 +11,7 @@
     <TableView fx:id="groupTable" prefHeight="200" prefWidth="300">
         <columns>
             <TableColumn fx:id="groupNumberColumn" text="Number" prefWidth="150"/>
-            <TableColumn fx:id="semiyearColumn" text="Semian" prefWidth="100"/>
+            <TableColumn fx:id="semiyearColumn" text="Semian" prefWidth="150"/>
         </columns>
     </TableView>
 

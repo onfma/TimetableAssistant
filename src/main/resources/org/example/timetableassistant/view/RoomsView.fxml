@@ -11,7 +11,7 @@
     <TableView fx:id="roomsTable" prefHeight="200" prefWidth="300">
         <columns>
             <TableColumn fx:id="roomNameColumn" text="Nume" prefWidth="150"/>
-            <TableColumn fx:id="roomTypeColumn" text="Tip" prefWidth="100"/>
+            <TableColumn fx:id="roomTypeColumn" text="Tip" prefWidth="150"/>
         </columns>
     </TableView>
 

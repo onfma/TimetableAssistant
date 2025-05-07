@@ -29,9 +29,11 @@ public class RoomsViewController {
         roomNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
         roomTypeColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getType()));
 
-        rooms.addAll(
-                roomService.getAllRooms()
-        );
+        try {
+            rooms.addAll(RoomService.getAllRooms());
+        } catch (Exception e) {
+            rooms.addAll(FXCollections.observableArrayList());
+        }
 
         roomsTable.setItems(rooms);
 
@@ -44,6 +46,10 @@ public class RoomsViewController {
         });
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
+    }
+
+    private void refreshTable() {
+        roomsTable.refresh();
     }
 
     private void handleAdd() throws Exception {
@@ -116,6 +122,8 @@ public class RoomsViewController {
                 rooms.add(Room);
             }
         });
+
+        refreshTable();
     }
 
     private void handleEdit() {
@@ -177,6 +185,8 @@ public class RoomsViewController {
         dialog.showAndWait().ifPresent(Room -> {
             roomsTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleDelete() {
@@ -196,5 +206,7 @@ public class RoomsViewController {
                 }
             }
         });
+
+        refreshTable();
     }
 }

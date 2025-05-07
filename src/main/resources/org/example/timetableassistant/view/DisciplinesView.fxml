@@ -10,8 +10,7 @@
 
     <TableView fx:id="disciplineTable" prefHeight="200" prefWidth="300">
         <columns>
-            <TableColumn fx:id="disciplineNameColumn" text="Nume Disciplina" prefWidth="150"/>
-            <TableColumn fx:id="disciplineTypeColumn" text="Tip" prefWidth="100"/>
+            <TableColumn fx:id="disciplineNameColumn" text="Nume Disciplina" prefWidth="300"/>
         </columns>
     </TableView>
 

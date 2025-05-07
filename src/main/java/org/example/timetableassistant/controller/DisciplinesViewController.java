@@ -7,12 +7,12 @@ import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Discipline;
 import org.example.timetableassistant.service.DisciplineService;
+import org.example.timetableassistant.service.GroupService;
 
 public class DisciplinesViewController {
 
     @FXML private TableView<Discipline> disciplineTable;
     @FXML private TableColumn<Discipline, String> disciplineNameColumn;
-    @FXML private TableColumn<Discipline, String> disciplineTypeColumn;
     @FXML private Button addButton;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
@@ -24,15 +24,21 @@ public class DisciplinesViewController {
     public void initialize() throws Exception {
         disciplineNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
 
-        disciplines.addAll(
-                disciplineService.getAllDisciplines()
-        );
+        try {
+            disciplines.addAll(DisciplineService.getAllDisciplines());
+        } catch (Exception e) {
+            disciplines.addAll(FXCollections.observableArrayList());
+        }
 
         disciplineTable.setItems(disciplines);
 
         addButton.setOnAction(e -> handleAdd());
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
+    }
+
+    private void refreshTable() {
+        disciplineTable.refresh();
     }
 
     private void handleAdd() {
@@ -69,6 +75,8 @@ public class DisciplinesViewController {
         dialog.showAndWait().ifPresent(discipline -> {
             disciplines.add(discipline);
         });
+
+        refreshTable();
     }
 
     private void handleEdit() {
@@ -108,6 +116,8 @@ public class DisciplinesViewController {
         dialog.showAndWait().ifPresent(discipline -> {
             disciplineTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleDelete() {
@@ -127,5 +137,7 @@ public class DisciplinesViewController {
                 }
             }
         });
+
+        refreshTable();
     }
 }

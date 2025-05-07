@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Group;
 import org.example.timetableassistant.model.Semiyear;
 import org.example.timetableassistant.service.GroupService;
+import org.example.timetableassistant.service.RoomService;
 
 public class GroupsViewController {
     @FXML private TableView<Group> groupTable;
@@ -25,9 +26,11 @@ public class GroupsViewController {
         groupNumberColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(String.valueOf(cell.getValue().getNumber())));
         semiyearColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getSemiyear().getValue()));
 
-        groups.addAll(
-                groupService.getAllGroups()
-        );
+        try {
+            groups.addAll(GroupService.getAllGroups());
+        } catch (Exception e) {
+            groups.addAll(FXCollections.observableArrayList());
+        }
 
         groupTable.setItems(groups);
 
@@ -40,6 +43,10 @@ public class GroupsViewController {
         });
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
+    }
+
+    private void refreshTable() {
+        groupTable.refresh();
     }
 
     private void handleAdd() throws Exception {
@@ -71,8 +78,8 @@ public class GroupsViewController {
                     int number = Integer.parseInt(numberField.getText());
                     String semiyearVal = semiyearComboBox.getValue();
                     Semiyear semiyear = Semiyear.fromString(semiyearVal);
-                    groupService.createGroup(number, semiyear);
-                    return groupService.getAllGroups().getLast();
+                    GroupService.createGroup(number, semiyear);
+                    return GroupService.getAllGroups().getLast();
                 } catch (NumberFormatException e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Numărul grupei trebuie să fie un număr întreg.");
                     errorAlert.showAndWait();
@@ -89,6 +96,8 @@ public class GroupsViewController {
                 groups.add(group);
             }
         });
+
+        refreshTable();
     }
 
     private void handleEdit() {
@@ -138,6 +147,8 @@ public class GroupsViewController {
         dialog.showAndWait().ifPresent(group -> {
             groupTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleDelete() {
@@ -149,7 +160,7 @@ public class GroupsViewController {
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
                 try{
-                    groupService.deleteGroup(selected.getId());
+                    GroupService.deleteGroup(selected.getId());
                     groups.remove(selected);
                 } catch (Exception e) {
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea grupei: " + e.getMessage());
@@ -157,6 +168,8 @@ public class GroupsViewController {
                 }
             }
         });
+
+        refreshTable();
     }
 
     private void showAlert(String title, String message) {

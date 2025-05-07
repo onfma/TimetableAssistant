@@ -9,6 +9,7 @@ import org.example.timetableassistant.database.crud.ClassType;
 import org.example.timetableassistant.model.*;
 import org.example.timetableassistant.service.DisciplineAllocationService;
 import org.example.timetableassistant.service.DisciplineService;
+import org.example.timetableassistant.service.RoomService;
 import org.example.timetableassistant.service.TeacherService;
 
 import java.util.Arrays;
@@ -45,10 +46,11 @@ public class TeachersViewController {
             }
         });
 
-
-        teachers.addAll(
-                TeacherService.getAllTeachers()
-        );
+        try {
+            teachers.addAll(TeacherService.getAllTeachers());
+        } catch (Exception e) {
+            teachers.addAll(FXCollections.observableArrayList());
+        }
 
         teacherTable.setItems(teachers);
 
