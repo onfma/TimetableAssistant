@@ -37,6 +37,7 @@ public class DatabaseServer {
             // Discipline Allocation Handler
             post("/discipline-allocation", (req, res) -> DisciplineAllocationHandler.createDisciplineAllocation(req, res));
             get("/discipline-allocation/get-all", (req, res) -> DisciplineAllocationHandler.getAllDisciplineAllocations(req, res));
+            get("/discipline-allocation/get-by-discipline-id/:id", DisciplineAllocationHandler::getAllDisciplineAllocationsByDisciplineId);
             get("/discipline-allocations/get-by-teacher-id/:id", DisciplineAllocationHandler::getAllDisciplineAllocationsByTeacherId);
             get("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.getDisciplineAllocationById(req, res));
             put("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.updateDisciplineAllocation(req, res));

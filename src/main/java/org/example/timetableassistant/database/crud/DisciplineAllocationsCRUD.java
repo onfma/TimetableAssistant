@@ -145,6 +145,41 @@ public class DisciplineAllocationsCRUD {
         }
     }
 
+    public OperationResult getAllDisciplineAllocationsByDisciplineId(int disciplineId) {
+        String query = "SELECT * FROM discipline_allocations WHERE discipline_id = ?";
+        List<Map<String, Object>> allocations = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, disciplineId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("discipline_id", rs.getInt("discipline_id"));
+                data.put("teacher_id", rs.getInt("teacher_id"));
+
+                int classTypeId = rs.getInt("class_type_id");
+                data.put("class_type", ClassType.fromInt(classTypeId).name());  // enum în loc de id numeric
+
+                data.put("hours_per_week", rs.getInt("hours_per_week"));
+                allocations.add(data);
+            }
+
+            if (allocations.isEmpty()) {
+                return new OperationResult(false, "Nu există alocări pentru disciplina cu ID-ul " + disciplineId + ".");
+            }
+
+            return new OperationResult(true, allocations);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea alocărilor pentru disciplină: " + e.getMessage());
+        }
+    }
+
+
 
     public OperationResult deleteDisciplineAllocation(int id) {
         String query = "DELETE FROM discipline_allocations WHERE id = ?";
