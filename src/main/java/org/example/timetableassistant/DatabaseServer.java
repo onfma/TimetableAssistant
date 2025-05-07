@@ -25,6 +25,7 @@ public class DatabaseServer {
             get("/classes/get-by-room-id/:roomId", (req, res) -> ClassHandler.getClassesByRoomId(req, res));
             get("/classes/get-by-semiyear-id/:semiyearId", (req, res) -> ClassHandler.getClassesBySemiyearId(req, res));
             get("/classes/get-by-teacher-id/:teacherId", (req, res) -> ClassHandler.getClassesByTeacherId(req, res));
+            get("/classes/get-by-discipline-id/:disciplineId", (req, res) -> ClassHandler.getClassesByDisciplineId(req, res));
 
 
             // Discipline Handler
