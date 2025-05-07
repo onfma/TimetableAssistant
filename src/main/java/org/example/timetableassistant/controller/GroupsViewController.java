@@ -8,7 +8,6 @@ import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Group;
 import org.example.timetableassistant.model.Semiyear;
 import org.example.timetableassistant.service.GroupService;
-import org.example.timetableassistant.service.RoomService;
 
 public class GroupsViewController {
     @FXML private TableView<Group> groupTable;

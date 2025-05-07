@@ -1,6 +1,7 @@
 package org.example.timetableassistant.database.crud;
 import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
+import org.example.timetableassistant.model.Semiyear;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,18 +16,18 @@ public class ClassCRUD {
 
 
     public OperationResult insertClass(int disciplineId, ClassType classType, int roomId, int timeSlotId,
-                                       Integer semiyearId, Integer groupId, int teacherId) {
+                                       Semiyear semiyear, Integer groupId, int teacherId) {
         if (classType == ClassType.COURSE) {
-            if (semiyearId == null || groupId != null) {
+            if (semiyear == null || groupId != null) {
                 return new OperationResult(false, "Pentru tipul CURS trebuie să existe semiyearId și să NU existe groupId.");
             }
         } else {
-            if (groupId == null || semiyearId != null) {
+            if (groupId == null || semiyear != null) {
                 return new OperationResult(false, "Pentru tipuri non-CURS trebuie să existe groupId și să NU existe semiyearId.");
             }
         }
 
-        String query = "INSERT INTO classes (discipline_id, class_type_id, room_id, time_slot_id, semiyear_id, group_id, teacher_id) " +
+        String query = "INSERT INTO classes (discipline_id, class_type_id, room_id, time_slot_id, teacher_id, semiyear, group_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -35,9 +36,9 @@ public class ClassCRUD {
             stmt.setInt(2, classType.getValue()); // Using the enum's ID value
             stmt.setInt(3, roomId);
             stmt.setInt(4, timeSlotId);
-            stmt.setObject(5, semiyearId, Types.INTEGER); // Allowing null for semiyearId
-            stmt.setObject(6, groupId, Types.INTEGER);   // Allowing null for groupId
-            stmt.setInt(7, teacherId);
+            stmt.setInt(5, teacherId);
+            stmt.setObject(6, semiyear != null ? semiyear.getValue() : null, Types.VARCHAR); // Allowing null for semiyearId
+            stmt.setObject(7, groupId, Types.INTEGER);   // Allowing null for groupId
             stmt.executeUpdate();
             return new OperationResult(true, "Clasa a fost adăugată cu succes.");
         } catch (SQLException e) {
@@ -58,9 +59,11 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
-                classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", semiyear);
+                classInfo.put("group_id", rs.getObject("group_id"));
                 return new OperationResult(true, classInfo);
             } else {
                 return new OperationResult(false, "Clasa cu ID-ul " + id + " nu a fost găsită.");
@@ -72,26 +75,26 @@ public class ClassCRUD {
 
 
     public OperationResult updateClass(int id, int disciplineId, ClassType classType, int roomId, int timeSlotId,
-                                       Integer semiyearId, Integer groupId, int teacherId) {
+                                       Semiyear semiyear, Integer groupId, int teacherId) {
         if (classType == ClassType.COURSE) {
-            if (semiyearId == null || groupId != null) {
+            if (semiyear == null || groupId != null) {
                 return new OperationResult(false, "Pentru tipul CURS trebuie să existe semiyearId și să NU existe groupId.");
             }
         } else {
-            if (groupId == null || semiyearId != null) {
+            if (groupId == null || semiyear != null) {
                 return new OperationResult(false, "Pentru tipuri non-CURS trebuie să existe groupId și să NU existe semiyearId.");
             }
         }
 
         String query = "UPDATE classes SET discipline_id = ?, class_type_id = ?, room_id = ?, time_slot_id = ?, " +
-                "semiyear_id = ?, group_id = ?, teacher_id = ? WHERE id = ?";
+                "semiyear = ?, group_id = ?, teacher_id = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, disciplineId);
             stmt.setInt(2, classType.getValue());
             stmt.setInt(3, roomId);
             stmt.setInt(4, timeSlotId);
-            stmt.setObject(5, semiyearId, Types.INTEGER);
+            stmt.setObject(5, semiyear != null ? semiyear.getValue() : null, Types.VARCHAR);
             stmt.setObject(6, groupId, Types.INTEGER);
             stmt.setInt(7, teacherId);
             stmt.setInt(8, id);
@@ -139,7 +142,9 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", semiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);
@@ -167,7 +172,9 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", semiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);
@@ -180,12 +187,11 @@ public class ClassCRUD {
         }
     }
 
-
-    public OperationResult getClassesBySemiyearId(int semiyearId) {
-        String query = "SELECT * FROM classes WHERE semiyear_id = ?";
+    public OperationResult getClassesBySemiyear(Semiyear semiyear) {
+        String query = "SELECT * FROM classes WHERE semiyear = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, semiyearId);
+            stmt.setString(1, semiyear.getValue());
             ResultSet rs = stmt.executeQuery();
             List<Map<String, Object>> classes = new ArrayList<>();
             while (rs.next()) {
@@ -195,16 +201,18 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear auxSemiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", auxSemiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);
             }
             return classes.isEmpty() ?
-                    new OperationResult(false, "Nu au fost găsite clase pentru semestrul cu ID-ul " + semiyearId) :
+                    new OperationResult(false, "Nu au fost găsite clase pentru semestrul " + semiyear.getValue()) :
                     new OperationResult(true, classes);
         } catch (SQLException e) {
-            return new OperationResult(false, "Eroare la obținerea claselor pentru semestrul cu ID-ul " + semiyearId + ": " + e.getMessage());
+            return new OperationResult(false, "Eroare la obținerea claselor pentru semestrul " + semiyear.getValue() + ": " + e.getMessage());
         }
     }
 
@@ -223,7 +231,9 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", semiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);
@@ -253,7 +263,9 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", semiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);
@@ -284,7 +296,9 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));  // poate fi null
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null; // poate fi null
+                classInfo.put("semiyear", semiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));        // poate fi null
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);

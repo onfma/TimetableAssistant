@@ -3,62 +3,72 @@ package org.example.timetableassistant.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import org.example.timetableassistant.model.ScheduleEntry;
-import org.example.timetableassistant.service.ClassService;
+import org.example.timetableassistant.database.crud.ClassType;
+import org.example.timetableassistant.model.*;
+import org.example.timetableassistant.model.Class;
+import org.example.timetableassistant.service.*;
 
 public class ClassFormController {
 
-    @FXML private ComboBox<String> groupComboBox;
-    @FXML private ComboBox<String> disciplineComboBox;
-    @FXML private ComboBox<String> teacherComboBox;
-    @FXML private ComboBox<String> roomComboBox;
-    @FXML private ComboBox<String> timeSlotComboBox;
+    @FXML private ComboBox<Group> groupComboBox;
+    @FXML private ComboBox<Discipline> disciplineComboBox;
+    @FXML private ComboBox<Teacher> teacherComboBox;
+    @FXML private ComboBox<Room> roomComboBox;
+    @FXML private ComboBox<TimeSlot> timeSlotComboBox;
     @FXML private ComboBox<String> classTypeComboBox;
 
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
 
-    private ScheduleEntry entryToEdit;
-
+    private Class entryToEdit;
     private boolean isSaveClicked = false;
 
     public boolean isSaveClicked() {
         return isSaveClicked;
     }
 
-    public ScheduleEntry getScheduleEntry() {
-        return new ScheduleEntry(
-                timeSlotComboBox.getValue(),
-                timeSlotComboBox.getValue(),
-                disciplineComboBox.getValue(),
-                teacherComboBox.getValue(),
-                roomComboBox.getValue(),
-                groupComboBox.getValue(),
-                classTypeComboBox.getValue()
+    public Class getClassEntry() {
+        Group group = groupComboBox.getValue();
+        Semiyear semiyear = entryToEdit != null ? entryToEdit.getSemiyear() : Semiyear.SEM_1A;
+        return new Class(
+                entryToEdit != null ? entryToEdit.getClassId() : null,
+                disciplineComboBox.getValue().getId(),
+                ClassType.valueOf(classTypeComboBox.getValue()),
+                roomComboBox.getValue().getId(),
+                timeSlotComboBox.getValue().getId(),
+                group != null ? group.getId() : null,
+                semiyear,
+                teacherComboBox.getValue().getId()
         );
     }
 
-    public void setEntryToEdit(ScheduleEntry entry) {
+    public void setEntryToEdit(Class entry) {
         this.entryToEdit = entry;
 
         if (entry != null) {
-            groupComboBox.setValue(entry.getGroup());
-            disciplineComboBox.setValue(entry.getSubject());
-            teacherComboBox.setValue(entry.getTeacher());
-            roomComboBox.setValue(entry.getRoom());
-            timeSlotComboBox.setValue(entry.getTime());
-            classTypeComboBox.setValue(entry.getClassType());
+            if (entry.getGroupId() != null) {
+                groupComboBox.setValue(getGroupById(entry.getGroupId()));
+            }
+            disciplineComboBox.setValue(getDisciplineById(entry.getDisciplineId()));
+            teacherComboBox.setValue(getTeacherById(entry.getTeacherId()));
+            roomComboBox.setValue(getRoomById(entry.getRoomId()));
+            TimeSlot selectedSlot = timeSlotComboBox.getItems().stream()
+                    .filter(slot -> slot.getId() == entry.getTimeSlotId())
+                    .findFirst()
+                    .orElse(null);
+            timeSlotComboBox.setValue(selectedSlot);
+            classTypeComboBox.setValue(entry.getClassType().name());
         }
     }
 
+
     @FXML
-    private void initialize() {
-        //Dummy data
-        groupComboBox.getItems().addAll("Grupa 1", "Grupa 2", "Grupa 3");
-        disciplineComboBox.getItems().addAll("Matematică", "Informatica", "Fizică");
-        teacherComboBox.getItems().addAll("Profesor A", "Profesor B", "Profesor C");
-        roomComboBox.getItems().addAll("Sala 101", "Sala 102", "Sala 103");
-        timeSlotComboBox.getItems().addAll("08:00-10:00", "10:00-12:00", "12:00-14:00", "14:00-16:00");
+    private void initialize() throws Exception {
+        disciplineComboBox.getItems().addAll(DisciplineService.getAllDisciplines());
+        teacherComboBox.getItems().addAll(TeacherService.getAllTeachers());
+        roomComboBox.getItems().addAll(RoomService.getAllRooms());
+        groupComboBox.getItems().addAll(GroupService.getAllGroups());
+        timeSlotComboBox.getItems().addAll(TimeSlotService.getAllTimeSlots());
         classTypeComboBox.getItems().addAll("Curs", "Seminar", "Laborator");
 
         cancelButton.setOnAction(e -> ((Stage) cancelButton.getScene().getWindow()).close());
@@ -66,19 +76,41 @@ public class ClassFormController {
         saveButton.setOnAction(e -> {
             isSaveClicked = true;
             try {
-                String jsonPayload = String.format(
-                        "{\"discipline_id\": \"%s\", \"class_type\": \"%s\", \"room_id\": \"%s\", \"time_slot_id\": \"%s\", \"teacher_id\": \"%s\", \"group_id\": \"%s\"}",
-                        disciplineComboBox.getValue(),
-                        classTypeComboBox.getValue(),
-                        roomComboBox.getValue(),
-                        timeSlotComboBox.getValue(),
-                        teacherComboBox.getValue(),
-                        groupComboBox.getValue()
-                );
+                Group group = groupComboBox.getValue();
+                Discipline discipline = disciplineComboBox.getValue();
+                Teacher teacher = teacherComboBox.getValue();
+                Room room = roomComboBox.getValue();
+                String classTypeStr = classTypeComboBox.getValue();
+                TimeSlot timeSlot = timeSlotComboBox.getValue();
+                Semiyear semiyear = null;
+                if (group != null) {
+                    semiyear = group.getSemiyear();
+                }
 
-                String response = ClassService.createClass(jsonPayload);
-                System.out.println(response);
-                isSaveClicked = true;
+                if (entryToEdit == null) {
+                    String response = ClassService.createClass(
+                            discipline.getId(),
+                            ClassType.valueOf(classTypeStr),
+                            room.getId(),
+                            timeSlot.getId(),
+                            semiyear,
+                            group != null ? group.getId() : null,
+                            teacher.getId()
+                    );
+                    System.out.println(response);
+                } else {
+                    String response = ClassService.updateClass(
+                            entryToEdit.getClassId(),
+                            discipline.getId(),
+                            ClassType.valueOf(classTypeStr),
+                            room.getId(),
+                            timeSlot.getId(),
+                            semiyear,
+                            group != null ? group.getId() : null,
+                            teacher.getId()
+                    );
+                    System.out.println(response);
+                }
                 ((Stage) saveButton.getScene().getWindow()).close();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -93,5 +125,33 @@ public class ClassFormController {
         alert.setHeaderText(null);
         alert.setContentText(s);
         alert.showAndWait();
+    }
+
+    private Group getGroupById(int id) {
+        return groupComboBox.getItems().stream()
+                .filter(g -> g.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Teacher getTeacherById(int id) {
+        return teacherComboBox.getItems().stream()
+                .filter(t -> t.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Discipline getDisciplineById(int id) {
+        return disciplineComboBox.getItems().stream()
+                .filter(d -> d.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Room getRoomById(int id) {
+        return roomComboBox.getItems().stream()
+                .filter(r -> r.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 }
