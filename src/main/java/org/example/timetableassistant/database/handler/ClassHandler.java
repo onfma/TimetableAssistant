@@ -214,6 +214,34 @@ public class ClassHandler {
         }
     }
 
+
+    public static String getClassesByDisciplineId(Request req, Response res) {
+        int disciplineId;
+
+        try {
+            disciplineId = Integer.parseInt(req.params(":disciplineId"));
+        } catch (NumberFormatException e) {
+            res.status(400);
+            return "{\"error\":\"ID invalid pentru disciplină.\"}";
+        }
+
+        OperationResult result = classCRUD.getClassesByDisciplineId(disciplineId);
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
+
     public static String getAllClasses(Request req, Response res) {
         OperationResult result = classCRUD.getAllClasses();
 
