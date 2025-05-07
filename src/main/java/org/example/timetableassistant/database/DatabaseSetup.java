@@ -50,12 +50,15 @@ public class DatabaseSetup {
             """;
 
             String createGroups = """
+                CREATE TYPE semiyear_enum AS ENUM ('1A', '1B', '2A', '2B', '3A', '3B');
+            
                 CREATE TABLE IF NOT EXISTS groups (
                     id SERIAL PRIMARY KEY,
-                    name VARCHAR(10) NOT NULL,           -- A1, A2, B1...
-                    semiyear_id INT REFERENCES semiyears(id)
+                    number INT NOT NULL,
+                    semiyear semiyear_enum NOT NULL,
+                    UNIQUE (number, semiyear)
                 );
-                """;
+            """;
 
             String createStudents = """
                 CREATE TABLE IF NOT EXISTS students (

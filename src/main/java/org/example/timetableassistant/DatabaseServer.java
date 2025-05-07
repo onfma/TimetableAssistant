@@ -86,7 +86,7 @@ public class DatabaseServer {
             get("/group/:id", GroupHandler::getGroupById);
             put("/group/:id", GroupHandler::updateGroup);
             delete("/group/:id", GroupHandler::deleteGroup);
-            get("/group/get-by-name/:name", GroupHandler::getGroupByName);
+            get("/group/get-by-number-semiyear/:name", GroupHandler::getGroupByNumberAndSemiyear);
 
         });
 
