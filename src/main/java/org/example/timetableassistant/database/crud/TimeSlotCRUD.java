@@ -50,9 +50,6 @@ public class TimeSlotCRUD {
         }
     }
 
-
-
-
     public OperationResult updateTimeSlot(int id, String newDayOfWeek, Time newStartTime, Time newEndTime) {
         String query = "UPDATE time_slots SET day_of_week = ?, start_time = ?, end_time = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);

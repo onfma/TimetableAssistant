@@ -23,7 +23,7 @@ public class DatabaseServer {
             get("/class/:id", (req, res) -> ClassHandler.getClassById(req, res));
             get("/class/get-by-group-id/:groupId", (req, res) -> ClassHandler.getClassesByGroupId(req, res));
             get("/classes/get-by-room-id/:roomId", (req, res) -> ClassHandler.getClassesByRoomId(req, res));
-            get("/classes/get-by-semiyear-id/:semiyearId", (req, res) -> ClassHandler.getClassesBySemiyearId(req, res));
+            get("/classes/get-by-semiyear/:semiyear", (req, res) -> ClassHandler.getClassesBySemiyear(req, res));
             get("/classes/get-by-teacher-id/:teacherId", (req, res) -> ClassHandler.getClassesByTeacherId(req, res));
             get("/classes/get-by-discipline-id/:disciplineId", (req, res) -> ClassHandler.getClassesByDisciplineId(req, res));
 

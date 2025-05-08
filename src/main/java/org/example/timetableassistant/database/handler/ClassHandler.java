@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import org.example.timetableassistant.database.OperationResult;
 import org.example.timetableassistant.database.crud.ClassCRUD;
 import org.example.timetableassistant.database.crud.ClassType;
+import org.example.timetableassistant.model.Semiyear;
 import spark.Request;
 import spark.Response;
 
@@ -18,7 +19,16 @@ public class ClassHandler {
         int teacherId = Integer.parseInt(req.queryParams("teacher_id"));
 
         // Valori opționale
-        Integer semiyearId = req.queryParams("semiyear_id") != null ? Integer.parseInt(req.queryParams("semiyear_id")) : null;
+        String semiyearStr = req.queryParams("semiyear");
+        Semiyear semiyear = null;
+        if (semiyearStr != null) {
+            try{
+                semiyear = Semiyear.valueOf(semiyearStr);
+            } catch(Exception e){
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
+            }
+        }
         Integer groupId = req.queryParams("group_id") != null ? Integer.parseInt(req.queryParams("group_id")) : null;
 
         if (disciplineId == 0 || classTypeString == null || roomId == 0 || timeSlotId == 0 || teacherId == 0) {
@@ -39,7 +49,7 @@ public class ClassHandler {
                 classType,
                 roomId,
                 timeSlotId,
-                semiyearId,
+                semiyear,
                 groupId,
                 teacherId
         );
@@ -82,7 +92,16 @@ public class ClassHandler {
         int timeSlotId = Integer.parseInt(req.queryParams("time_slot_id"));
         int teacherId = Integer.parseInt(req.queryParams("teacher_id"));
 
-        Integer semiyearId = req.queryParams("semiyear_id") != null ? Integer.parseInt(req.queryParams("semiyear_id")) : null;
+        String semiyearStr = req.queryParams("semiyear");
+        Semiyear semiyear = null;
+        if (semiyearStr != null) {
+            try {
+                semiyear = Semiyear.valueOf(semiyearStr);
+            } catch (Exception e) {
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
+            }
+        }
         Integer groupId = req.queryParams("group_id") != null ? Integer.parseInt(req.queryParams("group_id")) : null;
 
         if (disciplineId == 0 || classTypeString == null || roomId == 0 || timeSlotId == 0 || teacherId == 0) {
@@ -104,7 +123,7 @@ public class ClassHandler {
                 classType,
                 roomId,
                 timeSlotId,
-                semiyearId,
+                semiyear,
                 groupId,
                 teacherId
         );
@@ -174,10 +193,24 @@ public class ClassHandler {
         }
     }
 
-    public static String getClassesBySemiyearId(Request req, Response res) {
-        int semiyearId = Integer.parseInt(req.params(":semiyearId"));
+    public static String getClassesBySemiyear(Request req, Response res) {
+        String semiyearStr = req.params(":semiyear");
+        if (semiyearStr == null) {
+            res.status(400);
+            return "{\"error\":\"Semiyear is required and cannot be null.\"}";
+        }
 
-        OperationResult result = classCRUD.getClassesBySemiyearId(semiyearId);
+        Semiyear semiyear = null;
+        if (semiyearStr != null) {
+            try {
+                semiyear = Semiyear.valueOf(semiyearStr);
+            } catch (Exception e) {
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
+            }
+        }
+
+        OperationResult result = classCRUD.getClassesBySemiyear(semiyear);
 
         Gson gson = new Gson();
 

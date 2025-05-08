@@ -134,11 +134,11 @@ public class DatabaseSetup {
                     room_id INT REFERENCES rooms(id),
                     time_slot_id INT REFERENCES time_slots(id),
                     teacher_id INT REFERENCES teachers(id),
-                    semiyear_id INT REFERENCES semiyears(id),
+                    semiyear semiyear_enum,
                     group_id INT REFERENCES groups(id),
                     CHECK (
-                        (class_type_id = 1 AND semiyear_id IS NOT NULL AND group_id IS NULL) OR  -- curs
-                        (class_type_id IN (2, 3) AND group_id IS NOT NULL AND semiyear_id IS NULL) -- sem/lab
+                        (class_type_id = 1 AND semiyear IS NOT NULL AND group_id IS NULL) OR  -- curs
+                        (class_type_id IN (2, 3) AND group_id IS NOT NULL AND semiyear IS NULL) -- sem/lab
                     )
                 );
             """;

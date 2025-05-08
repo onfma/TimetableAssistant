@@ -1,5 +1,6 @@
 package org.example.timetableassistant.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,68 +14,94 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.example.timetableassistant.model.ScheduleEntry;
+import org.example.timetableassistant.model.*;
+import org.example.timetableassistant.model.Class;
+import org.example.timetableassistant.service.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScheduleViewController {
 
-    @FXML
-    private ComboBox<String> filterTypeComboBox;
-    @FXML
-    private ComboBox<String> filterValueComboBox;
-    @FXML
-    private TableView<ScheduleEntry> scheduleTable;
+    @FXML private ComboBox<String> filterTypeComboBox;
+    @FXML private ComboBox<String> filterValueComboBox;
+    @FXML private TableView<Class> classTable;
 
-    @FXML
-    private TableColumn<ScheduleEntry, String> dayColumn;
-    @FXML
-    private TableColumn<ScheduleEntry, String> timeColumn;
-    @FXML
-    private TableColumn<ScheduleEntry, String> subjectColumn;
-    @FXML
-    private TableColumn<ScheduleEntry, String> teacherColumn;
-    @FXML
-    private TableColumn<ScheduleEntry, String> roomColumn;
-    @FXML
-    private TableColumn<ScheduleEntry, String> groupColumn;
-    @FXML
-    private TableColumn<ScheduleEntry, String> classTypeColumn;
+    @FXML private TableColumn<Class, String> dayColumn;
+    @FXML private TableColumn<Class, String> timeColumn;
+    @FXML private TableColumn<Class, String> subjectColumn;
+    @FXML private TableColumn<Class, String> teacherColumn;
+    @FXML private TableColumn<Class, String> roomColumn;
+    @FXML private TableColumn<Class, String> groupColumn;
+    @FXML private TableColumn<Class, String> classTypeColumn;
+    @FXML private TableColumn<Class, String> semiyearColumn;
 
-    private ObservableList<ScheduleEntry> allEntries = FXCollections.observableArrayList();
-    private ObservableList<ScheduleEntry> filteredEntries = FXCollections.observableArrayList();
+    @FXML private Button openAddFormButton;
+    @FXML private Button editButton;
+    @FXML private Button deleteButton;
 
-    @FXML
-    private Button openAddFormButton;
+    private ObservableList<Class> classes = FXCollections.observableArrayList();
+    private ObservableList<Class> filteredEntries = FXCollections.observableArrayList();
 
-    @FXML
-    private Button editButton;
+    private List<Teacher> allTeachers;
+    private List<Group> allGroups;
+    private List<Room> allRooms;
+    private List<Discipline> allDisciplines;
+    private List<TimeSlot> allTimeSlots;
 
     @FXML
     public void initialize() {
-        dayColumn.setCellValueFactory(new PropertyValueFactory<>("day"));
-        timeColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
-        subjectColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
-        teacherColumn.setCellValueFactory(new PropertyValueFactory<>("teacher"));
-        roomColumn.setCellValueFactory(new PropertyValueFactory<>("room"));
-        groupColumn.setCellValueFactory(new PropertyValueFactory<>("group"));
+        try {
+            allGroups = GroupService.getAllGroups();
+            allRooms = RoomService.getAllRooms();
+            allTeachers = TeacherService.getAllTeachers();
+            allDisciplines = DisciplineService.getAllDisciplines();
+            allTimeSlots = TimeSlotService.getAllTimeSlots();
+            classes.addAll(ClassService.getAllClasses());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        dayColumn.setCellValueFactory(cellData -> {
+            TimeSlot ts = getTimeSlotById(cellData.getValue().getTimeSlotId());
+            return new SimpleStringProperty(ts != null ? ts.getDayOfWeek() : "");
+        });
+
+        timeColumn.setCellValueFactory(cellData -> {
+            TimeSlot ts = getTimeSlotById(cellData.getValue().getTimeSlotId());
+            return new SimpleStringProperty(ts != null ? ts.getStartTime() + " - " + ts.getEndTime() : "");
+        });
+
+        subjectColumn.setCellValueFactory(cellData -> {
+            Discipline d = getDisciplineById(cellData.getValue().getDisciplineId());
+            return new SimpleStringProperty(d != null ? d.getName() : "");
+        });
+
+        teacherColumn.setCellValueFactory(cellData -> {
+            Teacher t = getTeacherById(cellData.getValue().getTeacherId());
+            return new SimpleStringProperty(t != null ? t.getName() : "");
+        });
+
+        roomColumn.setCellValueFactory(cellData -> {
+            Room r = getRoomById(cellData.getValue().getRoomId());
+            return new SimpleStringProperty(r != null ? r.getName() : "");
+        });
+
+        groupColumn.setCellValueFactory(cellData -> {
+            Group g = getGroupById(cellData.getValue().getGroupId());
+            return new SimpleStringProperty(g != null ? g.toString() : "");
+        });
+
         classTypeColumn.setCellValueFactory(new PropertyValueFactory<>("classType"));
+        semiyearColumn.setCellValueFactory(new PropertyValueFactory<>("semiyear"));
 
-        scheduleTable.setItems(filteredEntries);
-
+        classTable.setItems(classes);
         filterTypeComboBox.setItems(FXCollections.observableArrayList("Profesor", "Grupă", "Sală", "Disciplina"));
         filterTypeComboBox.setOnAction(event -> updateFilterValues());
 
         filterValueComboBox.setOnAction(event -> applyFilter());
-
-        // Dummy data
-        allEntries.addAll(
-                new ScheduleEntry("Luni", "10:00 - 12:00", "POO", "Prof. Ionescu", "C101", "1A2", "Curs"),
-                new ScheduleEntry("Marți", "12:00 - 14:00", "BD", "Prof. Popescu", "C201", "2B1", "Laborator")
-        );
-
-        filteredEntries.setAll(allEntries);
+        updateFilterValues();
     }
 
     private void updateFilterValues() {
@@ -82,10 +109,10 @@ public class ScheduleViewController {
         if (selected == null) return;
 
         List<String> values = switch (selected) {
-            case "Profesor" -> allEntries.stream().map(ScheduleEntry::getTeacher).distinct().toList();
-            case "Grupă" -> allEntries.stream().map(ScheduleEntry::getGroup).distinct().toList();
-            case "Sală" -> allEntries.stream().map(ScheduleEntry::getRoom).distinct().toList();
-            case "Disciplina" -> allEntries.stream().map(ScheduleEntry::getSubject).distinct().toList();
+            case "Profesor" -> allTeachers.stream().map(Teacher::getName).distinct().toList();
+            case "Grupă" -> allGroups.stream().map(Group::toString).distinct().toList();
+            case "Sală" -> allRooms.stream().map(Room::getName).distinct().toList();
+            case "Disciplina" -> allDisciplines.stream().map(Discipline::getName).distinct().toList();
             default -> List.of();
         };
 
@@ -98,15 +125,29 @@ public class ScheduleViewController {
 
         if (filterType == null || filterValue == null) return;
 
-        filteredEntries.setAll(allEntries.stream().filter(entry -> {
+        filteredEntries.setAll(classes.stream().filter(entry -> {
             return switch (filterType) {
-                case "Profesor" -> entry.getTeacher().equals(filterValue);
-                case "Grupă" -> entry.getGroup().equals(filterValue);
-                case "Sală" -> entry.getRoom().equals(filterValue);
-                case "Disciplina" -> entry.getSubject().equals(filterValue);
+                case "Profesor" -> {
+                    Teacher t = getTeacherById(entry.getTeacherId());
+                    yield t != null && t.getName().equals(filterValue);
+                }
+                case "Grupă" -> {
+                    Group g = getGroupById(entry.getGroupId());
+                    yield g != null && g.toString().equals(filterValue);
+                }
+                case "Sală" -> {
+                    Room r = getRoomById(entry.getRoomId());
+                    yield r != null && r.getName().equals(filterValue);
+                }
+                case "Disciplina" -> {
+                    Discipline d = getDisciplineById(entry.getDisciplineId());
+                    yield d != null && d.getName().equals(filterValue);
+                }
                 default -> true;
             };
-        }).toList());
+        }).collect(Collectors.toList()));
+
+        classTable.setItems(filteredEntries);
     }
 
     @FXML
@@ -125,17 +166,17 @@ public class ScheduleViewController {
 
         ClassFormController controller = loader.getController();
         if (controller.isSaveClicked()) {
-            ScheduleEntry newEntry = controller.getScheduleEntry();
-            allEntries.add(newEntry);
-            filteredEntries.setAll(allEntries);
+            Class newClass = controller.getClassEntry();
+            classes.add(newClass);
+            updateFilterValues();
         }
     }
 
     @FXML
     private void handleEditEntry() throws IOException {
-        ScheduleEntry selectedEntry = scheduleTable.getSelectionModel().getSelectedItem();
+        Class selectedClass = classTable.getSelectionModel().getSelectedItem();
 
-        if (selectedEntry == null) {
+        if (selectedClass == null) {
             return;
         }
 
@@ -151,18 +192,63 @@ public class ScheduleViewController {
         dialogStage.setScene(scene);
 
         ClassFormController controller = loader.getController();
-        controller.setEntryToEdit(selectedEntry);
+        controller.setEntryToEdit(selectedClass);
 
         dialogStage.showAndWait();
 
         if (controller.isSaveClicked()) {
-            ScheduleEntry updatedEntry = controller.getScheduleEntry();
-
-            int index = allEntries.indexOf(selectedEntry);
+            Class updatedClass = controller.getClassEntry();
+            int index = classes.indexOf(selectedClass);
             if (index >= 0) {
-                allEntries.set(index, updatedEntry);
-                filteredEntries.setAll(allEntries);
+                classes.set(index, updatedClass);
+                updateFilterValues();
             }
         }
     }
+
+    @FXML
+    private void handleDeleteEntry() {
+        Class selectedClass = classTable.getSelectionModel().getSelectedItem();
+
+        if (selectedClass != null) {
+            classes.remove(selectedClass);
+            updateFilterValues();
+        }
+    }
+
+    private Teacher getTeacherById(int id) {
+        return allTeachers.stream()
+                .filter(t -> t.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Group getGroupById(int id) {
+        return allGroups.stream()
+                .filter(g -> g.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Room getRoomById(int id) {
+        return allRooms.stream()
+                .filter(r -> r.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Discipline getDisciplineById(int id) {
+        return allDisciplines.stream()
+                .filter(d -> d.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private TimeSlot getTimeSlotById(int id) {
+        return allTimeSlots.stream()
+                .filter(ts -> ts.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
 }
