@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import org.example.timetableassistant.database.OperationResult;
 import org.example.timetableassistant.database.crud.ClassCRUD;
 import org.example.timetableassistant.database.crud.ClassType;
+import org.example.timetableassistant.model.Semiyear;
 import spark.Request;
 import spark.Response;
 
@@ -18,9 +19,20 @@ public class ClassHandler {
         int teacherId = Integer.parseInt(req.queryParams("teacher_id"));
 
         // Valori opționale
-        Integer semiyearId = req.queryParams("semiyear_id") != null ? Integer.parseInt(req.queryParams("semiyear_id")) : null;
-        Integer groupId = req.queryParams("group_id") != null ? Integer.parseInt(req.queryParams("group_id")) : null;
-
+        String semiyearStr = req.queryParams("semiyear");
+        Semiyear semiyear = null;
+        if (semiyearStr != null && !semiyearStr.isEmpty()) {
+            try{
+                semiyear = Semiyear.valueOf(semiyearStr);
+            } catch(Exception e){
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
+            }
+        }
+        Integer groupId = (req.queryParams("group_id") != null && !req.queryParams("group_id").isEmpty())
+                    ? Integer.parseInt(req.queryParams("group_id"))
+                    : null;
+        
         if (disciplineId == 0 || classTypeString == null || roomId == 0 || timeSlotId == 0 || teacherId == 0) {
             res.status(400);
             return "Missing required fields.";
@@ -39,7 +51,7 @@ public class ClassHandler {
                 classType,
                 roomId,
                 timeSlotId,
-                semiyearId,
+                semiyear,
                 groupId,
                 teacherId
         );
@@ -74,6 +86,27 @@ public class ClassHandler {
         }
     }
 
+    public static String getClassesByTimeSlotId(Request req, Response res) {
+        int time_slot_id = Integer.parseInt(req.params(":time_slot_id"));
+
+        OperationResult result = classCRUD.getClassesByTimeSlotId(time_slot_id);
+
+        Gson gson = new Gson();
+
+        if (result.success) {
+            res.status(200);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message);
+            return gson.toJson(response);
+        } else {
+            res.status(404);
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
+
+
     public static String updateClass(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         int disciplineId = Integer.parseInt(req.queryParams("discipline_id"));
@@ -82,7 +115,16 @@ public class ClassHandler {
         int timeSlotId = Integer.parseInt(req.queryParams("time_slot_id"));
         int teacherId = Integer.parseInt(req.queryParams("teacher_id"));
 
-        Integer semiyearId = req.queryParams("semiyear_id") != null ? Integer.parseInt(req.queryParams("semiyear_id")) : null;
+        String semiyearStr = req.queryParams("semiyear");
+        Semiyear semiyear = null;
+        if (semiyearStr != null) {
+            try {
+                semiyear = Semiyear.valueOf(semiyearStr);
+            } catch (Exception e) {
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
+            }
+        }
         Integer groupId = req.queryParams("group_id") != null ? Integer.parseInt(req.queryParams("group_id")) : null;
 
         if (disciplineId == 0 || classTypeString == null || roomId == 0 || timeSlotId == 0 || teacherId == 0) {
@@ -104,7 +146,7 @@ public class ClassHandler {
                 classType,
                 roomId,
                 timeSlotId,
-                semiyearId,
+                semiyear,
                 groupId,
                 teacherId
         );
@@ -174,10 +216,24 @@ public class ClassHandler {
         }
     }
 
-    public static String getClassesBySemiyearId(Request req, Response res) {
-        int semiyearId = Integer.parseInt(req.params(":semiyearId"));
+    public static String getClassesBySemiyear(Request req, Response res) {
+        String semiyearStr = req.params(":semiyear");
+        if (semiyearStr == null) {
+            res.status(400);
+            return "{\"error\":\"Semiyear is required and cannot be null.\"}";
+        }
 
-        OperationResult result = classCRUD.getClassesBySemiyearId(semiyearId);
+        Semiyear semiyear = null;
+        if (semiyearStr != null) {
+            try {
+                semiyear = Semiyear.valueOf(semiyearStr);
+            } catch (Exception e) {
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
+            }
+        }
+
+        OperationResult result = classCRUD.getClassesBySemiyear(semiyear);
 
         Gson gson = new Gson();
 
@@ -212,5 +268,50 @@ public class ClassHandler {
             response.put("error", result.message);
             return gson.toJson(response);
         }
+    }
+
+
+    public static String getClassesByDisciplineId(Request req, Response res) {
+        int disciplineId;
+
+        try {
+            disciplineId = Integer.parseInt(req.params(":disciplineId"));
+        } catch (NumberFormatException e) {
+            res.status(400);
+            return "{\"error\":\"ID invalid pentru disciplină.\"}";
+        }
+
+        OperationResult result = classCRUD.getClassesByDisciplineId(disciplineId);
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
+
+    public static String getAllClasses(Request req, Response res) {
+        OperationResult result = classCRUD.getAllClasses();
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
     }
 }

@@ -3,7 +3,9 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TimeSlotCRUD {
@@ -48,9 +50,6 @@ public class TimeSlotCRUD {
         }
     }
 
-
-
-
     public OperationResult updateTimeSlot(int id, String newDayOfWeek, Time newStartTime, Time newEndTime) {
         String query = "UPDATE time_slots SET day_of_week = ?, start_time = ?, end_time = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -85,4 +84,34 @@ public class TimeSlotCRUD {
             return new OperationResult(false, "Eroare la ștergerea slotului de timp: " + e.getMessage());
         }
     }
+
+
+    public OperationResult getAllTimeSlots() {
+        String query = "SELECT * FROM time_slots";
+        List<Map<String, Object>> timeSlots = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> slotInfo = new HashMap<>();
+                slotInfo.put("id", rs.getInt("id"));
+                slotInfo.put("day_of_week", rs.getString("day_of_week"));
+                slotInfo.put("start_time", rs.getTime("start_time").toString().substring(0, 5)); // HH:mm
+                slotInfo.put("end_time", rs.getTime("end_time").toString().substring(0, 5));     // HH:mm
+                timeSlots.add(slotInfo);
+            }
+
+            if (timeSlots.isEmpty()) {
+                return new OperationResult(false, "Nu există sloturi de timp în baza de date.");
+            }
+
+            return new OperationResult(true, timeSlots);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea sloturilor de timp: " + e.getMessage());
+        }
+    }
+
 }

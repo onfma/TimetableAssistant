@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.example.timetableassistant.database.OperationResult;
 import org.example.timetableassistant.database.crud.GroupCRUD;
 import org.example.timetableassistant.database.crud.TeacherCRUD;
+import org.example.timetableassistant.model.Semiyear;
 import spark.Request;
 import spark.Response;
 
@@ -14,23 +15,29 @@ public class GroupHandler {
     private static final GroupCRUD groupCRUD = new GroupCRUD();
 
     public static String createGroup(Request req, Response res) {
-        String name = req.queryParams("name");
-        String semiyearIdStr = req.queryParams("semiyear_id");
+        String numberStr = req.queryParams("number");
+        String semiyearVal = req.queryParams("semiyear");
 
-        if (name == null || semiyearIdStr == null) {
+        if (numberStr == null || semiyearVal == null) {
             res.status(400);
-            return "{\"error\":\"Missing required fields (name, semiyear_id).\"}";
+            return "{\"error\":\"Missing required fields (number, semiyear).\"}";
         }
 
-        int semiyearId = Integer.parseInt(semiyearIdStr);
-        OperationResult result = groupCRUD.insertGroup(name, semiyearId);
+        try{
+            int number = Integer.parseInt(numberStr);
+            Semiyear semiyear = Semiyear.fromString(semiyearVal);
+            OperationResult result = groupCRUD.insertGroup(number, semiyear.getValue());
 
-        if (result.success) {
-            res.status(201);
-            return "{\"message\":\"" + result.message + "\"}";
-        } else {
-            res.status(500);
-            return "{\"error\":\"" + result.message + "\"}";
+            if (result.success) {
+                res.status(201);
+                return "{\"message\":\"" + result.message + "\"}";
+            } else {
+                res.status(500);
+                return "{\"error\":\"" + result.message + "\"}";
+            }
+        } catch (IllegalArgumentException e) {
+            res.status(400);
+            return "{\"error\":\"Invalid semiyear value: " + semiyearVal + "\"}";
         }
     }
 
@@ -52,25 +59,49 @@ public class GroupHandler {
         }
     }
 
+    public static String getAllGroups(Request req, Response res) {
+        OperationResult result = groupCRUD.getAllGroups();
+
+        Gson gson = new Gson();
+        if (result.success) {
+            res.status(200);  // OK
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message);
+            return gson.toJson(response);
+        } else {
+            res.status(404);  // Not Found
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
+
+
     public static String updateGroup(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
-        String newName = req.queryParams("name");
-        String newSemiyearIdStr = req.queryParams("semiyear_id");
+        String newNumberStr = req.queryParams("number");
+        String newSemiyear = req.queryParams("semiyear");
 
-        if (newName == null || newSemiyearIdStr == null) {
+        if (newNumberStr == null || newSemiyear == null) {
             res.status(400);
-            return "{\"error\":\"Missing required fields (name, semiyear_id).\"}";
+            return "{\"error\":\"Missing required fields (number, semiyear).\"}";
         }
 
-        int newSemiyearId = Integer.parseInt(newSemiyearIdStr);
-        OperationResult result = groupCRUD.updateGroup(id, newName, newSemiyearId);
+        try {
+            int newNumber = Integer.parseInt(newNumberStr);
+            Semiyear semiyear = Semiyear.fromString(newSemiyear);
+            OperationResult result = groupCRUD.updateGroup(id, newNumber, semiyear.getValue());
 
-        if (result.success) {
-            res.status(200);
-            return "{\"message\":\"" + result.message + "\"}";
-        } else {
-            res.status(500);
-            return "{\"error\":\"" + result.message + "\"}";
+            if (result.success) {
+                res.status(200);
+                return "{\"message\":\"" + result.message + "\"}";
+            } else {
+                res.status(500);
+                return "{\"error\":\"" + result.message + "\"}";
+            }
+        } catch ( IllegalArgumentException e){
+                res.status(400);
+                return "{\"error\":\"Invalid semiyear value: " + newSemiyear + "\"}";
         }
     }
 
@@ -87,15 +118,17 @@ public class GroupHandler {
         }
     }
 
-    public static String getGroupByName(Request req, Response res) {
-        String name = req.params(":name");
+    public static String getGroupByNumberAndSemiyear(Request req, Response res) {
+        String numberStr = req.queryParams("number");
+        String semiyear = req.queryParams("semiyear");
 
-        if (name == null) {
+        if (numberStr == null || semiyear == null) {
             res.status(400);
             return "{\"error\":\"Missing required field (name).\"}";
         }
 
-        OperationResult result = groupCRUD.getGroupByName(name);
+        int number = Integer.parseInt(numberStr);
+        OperationResult result = groupCRUD.getGroupByNumberAndSemiyear(number, semiyear);
         Gson gson = new Gson();
 
         if (result.success) {

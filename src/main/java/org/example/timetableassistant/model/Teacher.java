@@ -1,27 +1,44 @@
 package org.example.timetableassistant.model;
 
+import org.example.timetableassistant.database.crud.ClassType;
+import org.example.timetableassistant.service.DisciplineAllocationService;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Teacher {
     private int id;
     private String name;
-    private List<String> disciplines;
 
-    public Teacher(int id, String name, List<String> disciplines) {
+    public Teacher(int id, String name) {
         this.id = id;
         this.name = name;
-        this.disciplines = disciplines;
     }
 
     public int getId() { return id; }
     public String getName() { return name; }
-    public List<String> getDisciplines() { return disciplines; }
 
+    public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
-    public void setDisciplines(List<String> disciplines) { this.disciplines = disciplines; }
+
+    public Map<String, List<ClassType>> getDisciplines() throws Exception {
+        Map<String, List<ClassType>> disciplines = new HashMap<>();
+        try {
+            List<DisciplineAllocation> allocations = DisciplineAllocationService.getByTeacherId(this.id);
+            allocations.forEach(disciplineAllocation -> {
+                disciplines.computeIfAbsent(disciplineAllocation.getDiscipline().getName(), k -> new ArrayList<>())
+                        .add(disciplineAllocation.getClassType());
+            });
+        } catch (Exception e) {
+            return disciplines;
+        }
+        return disciplines;
+    }
 
     @Override
     public String toString() {
-        return name + " - " + String.join(", ", disciplines);
+        return this.getName(); // or whatever method returns the teacher's name
     }
 }

@@ -50,12 +50,15 @@ public class DatabaseSetup {
             """;
 
             String createGroups = """
+                CREATE TYPE semiyear_enum AS ENUM ('1A', '1B', '2A', '2B', '3A', '3B');
+            
                 CREATE TABLE IF NOT EXISTS groups (
                     id SERIAL PRIMARY KEY,
-                    name VARCHAR(10) NOT NULL,           -- A1, A2, B1...
-                    semiyear_id INT REFERENCES semiyears(id)
+                    number INT NOT NULL,
+                    semiyear semiyear_enum NOT NULL,
+                    UNIQUE (number, semiyear)
                 );
-                """;
+            """;
 
             String createStudents = """
                 CREATE TABLE IF NOT EXISTS students (
@@ -91,7 +94,7 @@ public class DatabaseSetup {
                         id SERIAL PRIMARY KEY,
                         discipline_id INT REFERENCES disciplines(id),
                         teacher_id INT REFERENCES teachers(id),
-                        class_type_id INT REFERENCES class_types(id),
+                        class_type_id INT NOT NULL,
                         hours_per_week INT NOT NULL
                     );           
                     """;
@@ -102,6 +105,9 @@ public class DatabaseSetup {
                     name VARCHAR(20) NOT NULL UNIQUE,
                     CHECK (name IN ('curs', 'seminar', 'laborator'))
                 );
+                INSERT INTO room_types (name) VALUES ('curs');
+                INSERT INTO room_types (name) VALUES ('seminar');
+                INSERT INTO room_types (name) VALUES ('laborator');
                 """;
 
             String createRooms = """
@@ -124,20 +130,23 @@ public class DatabaseSetup {
                 """;
 
             String createClasses = """
-                CREATE TABLE IF NOT EXISTS classes (
+            CREATE TABLE IF NOT EXISTS classes (
                     id SERIAL PRIMARY KEY,
                     discipline_id INT REFERENCES disciplines(id),
                     class_type_id INT REFERENCES class_types(id),
                     room_id INT REFERENCES rooms(id),
                     time_slot_id INT REFERENCES time_slots(id),
                     teacher_id INT REFERENCES teachers(id),
-                    semiyear_id INT REFERENCES semiyears(id),
-                    group_id INT REFERENCES groups(id),
+                    semiyear semiyear_enum NULL,
+                    group_id INT NULL REFERENCES groups(id),
                     CHECK (
-                        (class_type_id = 1 AND semiyear_id IS NOT NULL AND group_id IS NULL) OR  -- curs
-                        (class_type_id IN (2, 3) AND group_id IS NOT NULL AND semiyear_id IS NULL) -- sem/lab
+                        (class_type_id = 1 AND semiyear IS NOT NULL AND group_id IS NULL) OR  -- curs
+                        (class_type_id IN (2, 3) AND group_id IS NOT NULL AND semiyear IS NULL) -- sem/lab
                     )
                 );
+            
+            ALTER TABLE discipline_allocations DROP CONSTRAINT IF EXISTS discipline_allocations_class_type_id_fkey;
+            ALTER TABLE discipline_allocations ADD CONSTRAINT valid_class_type CHECK (class_type_id IN (1, 2, 3));
             """;
 
             stmt.execute(createSemiYears);
@@ -153,6 +162,16 @@ public class DatabaseSetup {
             stmt.execute(createClasses);
 
             System.out.println("Tabelele au fost create cu succes în baza de date 'TimetableAssistant'!");
+
+            try {
+                String dbPopulationScript = new String(java.nio.file.Files.readAllBytes(
+                        java.nio.file.Paths.get("src/main/java/org/example/timetableassistant/database/db_population.sql")
+                ));
+                stmt.execute(dbPopulationScript);
+                System.out.println("Scriptul 'db_population.sql' a fost executat cu succes!");
+            } catch (java.io.IOException e) {
+                System.out.println("Eroare la citirea scriptului 'db_population.sql': " + e.getMessage());
+            }
 
         } catch (SQLException e) {
             System.out.println("Eroare la crearea tabelelor: " + e.getMessage());

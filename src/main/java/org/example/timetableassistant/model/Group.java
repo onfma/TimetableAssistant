@@ -2,24 +2,24 @@ package org.example.timetableassistant.model;
 
 public class Group {
     private int id;
-    private String name;
-    private String semiyearId;
+    private int number;
+    private Semiyear semiyear;
 
-    public Group(int id, String name, String semiyearId) {
+    public Group(int id, int number, Semiyear semiyear) {
         this.id = id;
-        this.name = name;
-        this.semiyearId = semiyearId;
+        this.number = number;
+        this.semiyear = semiyear;
     }
 
     public int getId() { return id; }
-    public String getName() { return name; }
-    public String getSemiyearId() { return semiyearId; }
+    public int getNumber() { return number; }
+    public Semiyear getSemiyear() { return semiyear; }
 
-    public void setName(String name) { this.name = name; }
-    public void setSemiyearId(String semiyearId) { this.semiyearId = semiyearId; }
+    public void setNumber(int number) { this.number = number; }
+    public void setSemiyear(Semiyear semiyear) { this.semiyear = semiyear; }
 
     @Override
     public String toString() {
-        return name;
+        return semiyear.getValue() + number;
     }
 }

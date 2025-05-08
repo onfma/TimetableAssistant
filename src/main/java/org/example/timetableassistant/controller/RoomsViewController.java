@@ -6,6 +6,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Room;
+import org.example.timetableassistant.model.RoomType;
+import org.example.timetableassistant.service.RoomService;
+import org.example.timetableassistant.service.RoomTypeService;
 
 public class RoomsViewController {
 
@@ -17,26 +20,39 @@ public class RoomsViewController {
     @FXML private Button deleteButton;
 
     private final ObservableList<Room> rooms = FXCollections.observableArrayList();
+    private final RoomTypeService roomTypeService = new RoomTypeService();
+    private final RoomService roomService = new RoomService();
+
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         roomNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
         roomTypeColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getType()));
 
-        //Example
-        rooms.addAll(
-                new Room(1, "C101", "curs"),
-                new Room(2, "C102", "laborator")
-        );
+        try {
+            rooms.addAll(RoomService.getAllRooms());
+        } catch (Exception e) {
+            rooms.addAll(FXCollections.observableArrayList());
+        }
 
         roomsTable.setItems(rooms);
 
-        addButton.setOnAction(e -> handleAdd());
+        addButton.setOnAction(e -> {
+            try {
+                handleAdd();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
     }
 
-    private void handleAdd() {
+    private void refreshTable() {
+        roomsTable.refresh();
+    }
+
+    private void handleAdd() throws Exception {
         Dialog<Room> dialog = new Dialog<>();
         dialog.setTitle("Add room");
 
@@ -45,11 +61,34 @@ public class RoomsViewController {
         TextField nameField = new TextField();
         nameField.setPromptText("Sala");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("curs", "laborator");
+        ComboBox<RoomType> typeComboBox = new ComboBox<>();
+        java.util.List<RoomType> roomTypes = roomTypeService.getAllRoomTypes();
+        typeComboBox.getItems().addAll(roomTypes);
         typeComboBox.setPromptText("Selectați tipul");
 
-        vbox.getChildren().addAll(new Label("Nume sală:"), nameField, new Label("Tip sală:"), typeComboBox);
+        typeComboBox.setCellFactory(cb -> new ListCell<RoomType>() {
+            @Override
+            protected void updateItem(RoomType item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
+        typeComboBox.setButtonCell(new ListCell<RoomType>() {
+            @Override
+            protected void updateItem(RoomType item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
+
+        TextField capacityField = new TextField();
+        capacityField.setPromptText("Capacitate");
+
+        vbox.getChildren().addAll(
+            new Label("Nume sală:"), nameField,
+            new Label("Tip sală:"), typeComboBox,
+            new Label("Capacitate:"), capacityField
+        );
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -60,16 +99,31 @@ public class RoomsViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
-                Room newRoom = new Room(rooms.size() + 1, name, type);
-                return newRoom;
+                RoomType type = typeComboBox.getValue();
+                String capacityText = capacityField.getText();
+                int capacity;
+                try {
+                    capacity = Integer.parseInt(capacityText);
+                    RoomService.createRoom(name, capacity, type.getId());
+                    return RoomService.getAllRooms().getLast();
+                } catch (NumberFormatException nfe) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Capacitatea trebuie să fie un număr întreg.");
+                    errorAlert.showAndWait();
+                } catch (Exception ex) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la adăugarea sălii: " + ex.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
             return null;
         });
 
         dialog.showAndWait().ifPresent(Room -> {
-            rooms.add(Room);
+            if (Room != null) {
+                rooms.add(Room);
+            }
         });
+
+        refreshTable();
     }
 
     private void handleEdit() {
@@ -84,10 +138,25 @@ public class RoomsViewController {
         TextField nameField = new TextField(selected.getName());
         nameField.setPromptText("Modificați numele sălii");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("curs", "laborator");
-        typeComboBox.setValue(selected.getType());
+        ComboBox<RoomType> typeComboBox = new ComboBox<>();
+        java.util.List<RoomType> roomTypes = roomTypeService.getAllRoomTypes();
+        typeComboBox.getItems().addAll(roomTypes);
         typeComboBox.setPromptText("Modificați tipul");
+
+        typeComboBox.setCellFactory(cb -> new ListCell<RoomType>() {
+            @Override
+            protected void updateItem(RoomType item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
+        typeComboBox.setButtonCell(new ListCell<RoomType>() {
+            @Override
+            protected void updateItem(RoomType item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.getName());
+            }
+        });
 
         vbox.getChildren().addAll(new Label("Nume sală:"), nameField, new Label("Tip sală:"), typeComboBox);
 
@@ -100,10 +169,15 @@ public class RoomsViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
-                selected.setName(name);
-                selected.setType(type);
-                return selected;
+                RoomType type = typeComboBox.getValue();
+                try {
+                    roomService.editRoom(selected.getId(), name,  selected.getCapacity(), type.getId());
+                    selected.setName(name);
+                    selected.setType(type.getName());
+                } catch (Exception ex) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la adăugarea sălii: " + ex.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
             return null;
         });
@@ -111,6 +185,8 @@ public class RoomsViewController {
         dialog.showAndWait().ifPresent(Room -> {
             roomsTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleDelete() {
@@ -122,7 +198,15 @@ public class RoomsViewController {
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
                 rooms.remove(selected);
+                try {
+                    roomService.deleteRoom(selected.getId());
+                } catch (Exception ex) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea sălii: " + ex.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
         });
+
+        refreshTable();
     }
 }

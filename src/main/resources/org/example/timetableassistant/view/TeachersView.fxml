@@ -8,10 +8,10 @@
 
     <Label text="Profesori" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-    <TableView fx:id="teacherTable" prefHeight="200" prefWidth="300">
+    <TableView fx:id="teacherTable" prefHeight="200" >
         <columns>
             <TableColumn fx:id="teacherNameColumn" text="Nume Profesor" prefWidth="150"/>
-            <TableColumn fx:id="disciplinesColumn" text="Discipline" prefWidth="150"/>
+            <TableColumn fx:id="disciplinesColumn" text="Discipline" prefWidth="400"/>
         </columns>
     </TableView>
 
@@ -19,6 +19,8 @@
         <Button fx:id="addButton" text="Adaugă"/>
         <Button fx:id="editButton" text="Editează"/>
         <Button fx:id="deleteButton" text="Șterge"/>
+        <Button fx:id="addDisciplineToTeacherButton" text="Asociaza materie"/>
+        <Button fx:id="removeDisciplineToTeacherButton" text="Șterge materie asociata"/>
     </HBox>
 
     <padding>

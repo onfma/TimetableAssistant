@@ -6,33 +6,39 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Discipline;
+import org.example.timetableassistant.service.DisciplineService;
+import org.example.timetableassistant.service.GroupService;
 
 public class DisciplinesViewController {
 
     @FXML private TableView<Discipline> disciplineTable;
     @FXML private TableColumn<Discipline, String> disciplineNameColumn;
-    @FXML private TableColumn<Discipline, String> disciplineTypeColumn;
     @FXML private Button addButton;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
 
     private final ObservableList<Discipline> disciplines = FXCollections.observableArrayList();
+    private final DisciplineService disciplineService = new DisciplineService();
 
     @FXML
-    public void initialize() {
+    public void initialize() throws Exception {
         disciplineNameColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getName()));
-        disciplineTypeColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().getType()));
 
-        disciplines.addAll(
-                new Discipline(1, "Matematică", "seminar"),
-                new Discipline(2, "Chimie", "laborator")
-        );
+        try {
+            disciplines.addAll(DisciplineService.getAllDisciplines());
+        } catch (Exception e) {
+            disciplines.addAll(FXCollections.observableArrayList());
+        }
 
         disciplineTable.setItems(disciplines);
 
         addButton.setOnAction(e -> handleAdd());
         editButton.setOnAction(e -> handleEdit());
         deleteButton.setOnAction(e -> handleDelete());
+    }
+
+    private void refreshTable() {
+        disciplineTable.refresh();
     }
 
     private void handleAdd() {
@@ -44,11 +50,7 @@ public class DisciplinesViewController {
         TextField nameField = new TextField();
         nameField.setPromptText("Introduceți numele disciplinei");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("seminar", "laborator");
-        typeComboBox.setPromptText("Selectați tipul");
-
-        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField, new Label("Tip disciplină:"), typeComboBox);
+        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField);
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -59,9 +61,13 @@ public class DisciplinesViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
-                Discipline newDiscipline = new Discipline(disciplines.size() + 1, name, type);
-                return newDiscipline;
+                try {
+                    DisciplineService.createDiscipline(name);
+                    return DisciplineService.getAllDisciplines().getLast();
+                } catch (Exception ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Eroare la crearea disciplinei: " + ex.getMessage());
+                    alert.showAndWait();
+                }
             }
             return null;
         });
@@ -69,6 +75,8 @@ public class DisciplinesViewController {
         dialog.showAndWait().ifPresent(discipline -> {
             disciplines.add(discipline);
         });
+
+        refreshTable();
     }
 
     private void handleEdit() {
@@ -83,12 +91,7 @@ public class DisciplinesViewController {
         TextField nameField = new TextField(selected.getName());
         nameField.setPromptText("Modificați numele disciplinei");
 
-        ComboBox<String> typeComboBox = new ComboBox<>();
-        typeComboBox.getItems().addAll("seminar", "laborator");
-        typeComboBox.setValue(selected.getType());
-        typeComboBox.setPromptText("Modificați tipul");
-
-        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField, new Label("Tip disciplină:"), typeComboBox);
+        vbox.getChildren().addAll(new Label("Nume disciplină:"), nameField);
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -99,10 +102,13 @@ public class DisciplinesViewController {
         dialog.setResultConverter(buttonType -> {
             if (buttonType == okButton) {
                 String name = nameField.getText();
-                String type = typeComboBox.getValue();
-                selected.setName(name);
-                selected.setType(type);
-                return selected;
+                try {
+                    DisciplineService.editDiscipline(selected.getId(), name);
+                    selected.setName(name);
+                    return selected;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
             return null;
         });
@@ -110,6 +116,8 @@ public class DisciplinesViewController {
         dialog.showAndWait().ifPresent(discipline -> {
             disciplineTable.refresh();
         });
+
+        refreshTable();
     }
 
     private void handleDelete() {
@@ -120,8 +128,16 @@ public class DisciplinesViewController {
                 ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(type -> {
             if (type == ButtonType.YES) {
-                disciplines.remove(selected);
+                try {
+                    disciplines.remove(selected);
+                    DisciplineService.deleteDiscipline(selected.getId());
+                } catch (Exception e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la ștergerea disciplinei: " + e.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
         });
+
+        refreshTable();
     }
 }

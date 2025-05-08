@@ -54,6 +54,75 @@ public class DisciplineAllocationHandler {
         }
     }
 
+    public static String getAllDisciplineAllocations(Request req, Response res) {
+        OperationResult result = disciplineAllocationCRUD.getAllDisciplineAllocations();
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+        return gson.toJson(response);
+    }
+
+    public static String getAllDisciplineAllocationsByTeacherId(Request req, Response res) {
+        int teacherId;
+        try {
+            teacherId = Integer.parseInt(req.params(":id"));
+        } catch (NumberFormatException e) {
+            res.status(400);
+            return "{\"error\":\"ID invalid pentru profesor.\"}";
+        }
+
+        OperationResult result = disciplineAllocationCRUD.getAllDisciplineAllocationsByTeacherId(teacherId);
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
+    public static String getAllDisciplineAllocationsByDisciplineId(Request req, Response res) {
+        int disciplineId;
+        try {
+            disciplineId = Integer.parseInt(req.params(":id"));
+        } catch (NumberFormatException e) {
+            res.status(400);
+            return "{\"error\":\"ID invalid pentru disciplină.\"}";
+        }
+
+        OperationResult result = disciplineAllocationCRUD.getAllDisciplineAllocationsByDisciplineId(disciplineId);
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
+
+
+
     public static String updateDisciplineAllocation(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         int newDisciplineId = Integer.parseInt(req.queryParams("discipline_id"));
