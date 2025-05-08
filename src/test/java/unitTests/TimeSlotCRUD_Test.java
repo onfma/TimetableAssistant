@@ -3,11 +3,11 @@ package unitTests;
 import org.example.timetableassistant.database.OperationResult;
 import org.example.timetableassistant.database.crud.TimeSlotCRUD;
 import org.example.timetableassistant.model.TimeSlot;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import org.mockito.MockedStatic;
+import org.junit.jupiter.api.Test;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,12 +16,13 @@ import java.util.Map;
 
 class TimeSlotCRUD_Test {
 
+    private final TimeSlotCRUD crud = new TimeSlotCRUD();
+    private final Connection mockConn = mock(Connection.class);
+    private final PreparedStatement mockStmt = mock(PreparedStatement.class);
+    private final ResultSet mockRs = mock(ResultSet.class);
+
     @Test
     void test_insertTimeSlot_Success() throws Exception{
-        TimeSlotCRUD crud = new TimeSlotCRUD();
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeUpdate()).thenReturn(1);
 
@@ -44,10 +45,6 @@ class TimeSlotCRUD_Test {
 
     @Test
     void testInsertTimeSlot_SQLException() throws Exception {
-        TimeSlotCRUD crud = new TimeSlotCRUD();
-
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeUpdate()).thenReturn(1);
 
@@ -70,10 +67,6 @@ class TimeSlotCRUD_Test {
         String testDay = "Monday";
         Time testStart = Time.valueOf("09:00:00");
         Time testEnd = Time.valueOf("10:00:00");
-
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-        ResultSet mockRs = mock(ResultSet.class);
 
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeQuery()).thenReturn(mockRs);
@@ -112,9 +105,6 @@ class TimeSlotCRUD_Test {
     void testGetTimeSlotById_SQLException() throws Exception {
         int testId = 1;
 
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-
         when(mockConn.prepareStatement(anyString())).thenThrow(new SQLException("Database error"));
 
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
@@ -135,9 +125,6 @@ class TimeSlotCRUD_Test {
         String newDay = "Tuesday";
         Time newStart = Time.valueOf("11:00:00");
         Time newEnd = Time.valueOf("12:00:00");
-
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
 
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeUpdate()).thenReturn(1);
@@ -166,9 +153,6 @@ class TimeSlotCRUD_Test {
         Time newStart = Time.valueOf("13:00:00");
         Time newEnd = Time.valueOf("14:00:00");
 
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeUpdate()).thenReturn(0);
 
@@ -191,8 +175,6 @@ class TimeSlotCRUD_Test {
         Time newStart = Time.valueOf("15:00:00");
         Time newEnd = Time.valueOf("16:00:00");
 
-        Connection mockConn = mock(Connection.class);
-
         when(mockConn.prepareStatement(anyString())).thenThrow(new SQLException("Update error"));
 
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
@@ -210,9 +192,6 @@ class TimeSlotCRUD_Test {
     @Test
     void testDeleteTimeSlot_Success() throws Exception {
         int testId = 1;
-
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
 
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeUpdate()).thenReturn(1);
@@ -235,9 +214,6 @@ class TimeSlotCRUD_Test {
     void testDeleteTimeSlot_NotFound() throws Exception {
         int testId = 2;
 
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeUpdate()).thenReturn(0);
 
@@ -259,8 +235,6 @@ class TimeSlotCRUD_Test {
     void testDeleteTimeSlot_SQLException() throws Exception {
         int testId = 3;
 
-        Connection mockConn = mock(Connection.class);
-
         when(mockConn.prepareStatement(anyString())).thenThrow(new SQLException("Delete error"));
 
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
@@ -277,10 +251,6 @@ class TimeSlotCRUD_Test {
 
     @Test
     void testGetAllTimeSlots_Success() throws Exception {
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-        ResultSet mockRs = mock(ResultSet.class);
-
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeQuery()).thenReturn(mockRs);
 
@@ -335,10 +305,6 @@ class TimeSlotCRUD_Test {
 
     @Test
     void testGetAllTimeSlots_Empty() throws Exception {
-        Connection mockConn = mock(Connection.class);
-        PreparedStatement mockStmt = mock(PreparedStatement.class);
-        ResultSet mockRs = mock(ResultSet.class);
-
         when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
         when(mockStmt.executeQuery()).thenReturn(mockRs);
         when(mockRs.next()).thenReturn(false);
@@ -357,8 +323,6 @@ class TimeSlotCRUD_Test {
 
     @Test
     void testGetAllTimeSlots_SQLException() throws Exception {
-        Connection mockConn = mock(Connection.class);
-
         when(mockConn.prepareStatement(anyString())).thenThrow(new SQLException("Query error"));
 
         try (MockedStatic<DriverManager> dm = mockStatic(DriverManager.class)) {
