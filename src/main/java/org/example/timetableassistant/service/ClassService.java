@@ -7,12 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URI;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +123,47 @@ public class ClassService {
         }
     }
 
-    public static List<Class> getByTimeSlotId(int timeSlotId){
-        return new ArrayList<>();
+    public static List<Class> getByTimeSlotId(int timeSlotId) throws Exception {
+        URL url = new URI("http://localhost:4567/db/classes/get-by-time-slot-id/" + timeSlotId).toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            reader.close();
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            JSONArray classesArray = jsonResponse.getJSONArray("message");
+            List<Class> classes = new ArrayList<>();
+            for (int i = 0; i < classesArray.length(); i++) {
+                JSONObject classObject = classesArray.getJSONObject(i);
+                Semiyear semiyear = null;
+                if (classObject.has("semiyear") && !classObject.isNull("semiyear")) {
+                    semiyear = Semiyear.valueOf(classObject.getString("semiyear"));
+                }
+                Class cls = new Class(
+                    classObject.getInt("id"),
+                    classObject.getInt("discipline_id"),
+                    ClassType.valueOf(classObject.getString("class_type")),
+                    classObject.getInt("room_id"),
+                    classObject.getInt("time_slot_id"),
+                    classObject.opt("group_id") instanceof Integer ? classObject.getInt("group_id") : null,
+                    semiyear,
+                    classObject.getInt("teacher_id")
+                );
+                classes.add(cls);
+            }
+            return classes;
+        } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            return new ArrayList<>();
+        } else {
+            throw new Exception("Failed to get classes by time slot id. HTTP error code: " + responseCode);
+        }
     }
 }

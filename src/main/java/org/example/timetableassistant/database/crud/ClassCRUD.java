@@ -132,7 +132,9 @@ public class ClassCRUD {
                 classInfo.put("class_type", ClassType.fromInt(rs.getInt("class_type_id")).name());
                 classInfo.put("room_id", rs.getInt("room_id"));
                 classInfo.put("time_slot_id", rs.getInt("time_slot_id"));
-                classInfo.put("semiyear_id", rs.getObject("semiyear_id"));
+                String semiyearStr = rs.getString("semiyear");
+                Semiyear semiyear = semiyearStr != null ? Semiyear.fromString(semiyearStr) : null;
+                classInfo.put("semiyear", semiyear);
                 classInfo.put("group_id", rs.getObject("group_id"));
                 classInfo.put("teacher_id", rs.getInt("teacher_id"));
                 classes.add(classInfo);

@@ -3,10 +3,7 @@ package org.example.timetableassistant.service;
 import org.example.timetableassistant.model.Semiyear;
 
 public class AssistantService {
-    public static void verifyClassCreation(int roomId, int timeSlotId, Semiyear semiyear, Integer groupId, int teacherId) {
-        // vericare time slot + grupa/semian
-        // time slot + prof
-        // time slot + sala
+    public static void verifyClassCreation(int roomId, int timeSlotId, Semiyear semiyear, Integer groupId, int teacherId) throws Exception {
 
         ClassService.getByTimeSlotId(timeSlotId)
                 .forEach(classEntry -> {
