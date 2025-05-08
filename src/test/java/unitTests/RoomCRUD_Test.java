@@ -1,8 +1,9 @@
 package unitTests;
 
 import org.example.timetableassistant.database.OperationResult;
+import org.example.timetableassistant.database.crud.RoomCRUD;
 import org.example.timetableassistant.database.crud.TeacherCRUD;
-import org.example.timetableassistant.model.Teacher;
+import org.example.timetableassistant.model.Room;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -14,11 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TeacherCRUD_Test {
+public class RoomCRUD_Test {
 
-    private final TeacherCRUD crud = new TeacherCRUD();
+    private final RoomCRUD crud = new RoomCRUD();
     private final Connection mockConn = mock(Connection.class);
     private final PreparedStatement mockStmt = mock(PreparedStatement.class);
     private final ResultSet mockRs = mock(ResultSet.class);
-
 }
