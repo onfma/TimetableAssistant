@@ -105,6 +105,9 @@ public class DatabaseSetup {
                     name VARCHAR(20) NOT NULL UNIQUE,
                     CHECK (name IN ('curs', 'seminar', 'laborator'))
                 );
+                INSERT INTO room_types (name) VALUES ('curs');
+                INSERT INTO room_types (name) VALUES ('seminar');
+                INSERT INTO room_types (name) VALUES ('laborator');
                 """;
 
             String createRooms = """
@@ -127,7 +130,7 @@ public class DatabaseSetup {
                 """;
 
             String createClasses = """
-                CREATE TABLE IF NOT EXISTS classes (
+            CREATE TABLE IF NOT EXISTS classes (
                     id SERIAL PRIMARY KEY,
                     discipline_id INT REFERENCES disciplines(id),
                     class_type_id INT REFERENCES class_types(id),
@@ -141,6 +144,9 @@ public class DatabaseSetup {
                         (class_type_id IN (2, 3) AND group_id IS NOT NULL AND semiyear IS NULL) -- sem/lab
                     )
                 );
+            
+            ALTER TABLE discipline_allocations DROP CONSTRAINT IF EXISTS discipline_allocations_class_type_id_fkey;
+            ALTER TABLE discipline_allocations ADD CONSTRAINT valid_class_type CHECK (class_type_id IN (1, 2, 3));
             """;
 
             stmt.execute(createSemiYears);
@@ -156,6 +162,16 @@ public class DatabaseSetup {
             stmt.execute(createClasses);
 
             System.out.println("Tabelele au fost create cu succes în baza de date 'TimetableAssistant'!");
+
+            try {
+                String dbPopulationScript = new String(java.nio.file.Files.readAllBytes(
+                        java.nio.file.Paths.get("src/main/java/org/example/timetableassistant/database/db_population.sql")
+                ));
+                stmt.execute(dbPopulationScript);
+                System.out.println("Scriptul 'db_population.sql' a fost executat cu succes!");
+            } catch (java.io.IOException e) {
+                System.out.println("Eroare la citirea scriptului 'db_population.sql': " + e.getMessage());
+            }
 
         } catch (SQLException e) {
             System.out.println("Eroare la crearea tabelelor: " + e.getMessage());
