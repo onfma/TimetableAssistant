@@ -8,6 +8,9 @@ import org.example.timetableassistant.model.*;
 import org.example.timetableassistant.model.Class;
 import org.example.timetableassistant.service.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class ClassFormController {
 
     @FXML private ComboBox<Group> groupComboBox;
@@ -90,6 +93,23 @@ public class ClassFormController {
         timeSlotComboBox.getItems().addAll(TimeSlotService.getAllTimeSlots());
         classTypeComboBox.getItems().addAll("Curs", "Seminar", "Laborator");
 
+        disciplineComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            teacherComboBox.getItems().clear();
+            if (newVal != null) {
+                try {
+                    List<Teacher> teachers = DisciplineAllocationService.getByDisciplineId(newVal.getId())
+                            .stream()
+                            .map(DisciplineAllocation::getTeacher)
+                            .collect(Collectors.toList());
+                    teacherComboBox.getItems().addAll(
+                            teachers
+                    );
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        
         cancelButton.setOnAction(e -> ((Stage) cancelButton.getScene().getWindow()).close());
 
         saveButton.setOnAction(e -> {

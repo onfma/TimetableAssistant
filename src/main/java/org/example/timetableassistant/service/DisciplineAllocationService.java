@@ -103,6 +103,39 @@ public class DisciplineAllocationService {
         }
     }
 
+    public static List<DisciplineAllocation> getByDisciplineId(int id) throws Exception {
+        URL url = new URI(BASE_URL + "/get-by-discipline-id/" + id).toURL();
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            JSONArray daArray = jsonResponse.getJSONArray("message");
+            List<DisciplineAllocation> das = new ArrayList<>();
+            for (int i = 0; i < daArray.length(); i++) {
+                JSONObject roomObj = daArray.getJSONObject(i);
+                int das_id = roomObj.getInt("id");
+                Discipline discipline = DisciplineService.getDisciplineById(roomObj.getInt("discipline_id"));
+                Teacher teacher = TeacherService.getTeacherById(roomObj.getInt("teacher_id"));
+                ClassType classType = ClassType.valueOf(roomObj.getString("class_type"));
+                das.add(new DisciplineAllocation(das_id, discipline, teacher, classType));
+            }
+            return das;
+        } else {
+            throw new Exception("Failed to get teachers. HTTP error code: " + responseCode);
+        }
+    }
+
     public static void deleteAllocation(int id) {
         try {
             URL url = new URI(BASE_URL + "/" + id).toURL();
