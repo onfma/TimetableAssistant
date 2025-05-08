@@ -26,7 +26,7 @@ public class DatabaseServer {
             get("/classes/get-by-semiyear/:semiyear", (req, res) -> ClassHandler.getClassesBySemiyear(req, res));
             get("/classes/get-by-teacher-id/:teacherId", (req, res) -> ClassHandler.getClassesByTeacherId(req, res));
             get("/classes/get-by-discipline-id/:disciplineId", (req, res) -> ClassHandler.getClassesByDisciplineId(req, res));
-
+            get("/classes/get-by-time-slot-id/:time_slot_id", (req, res) -> ClassHandler.getClassesByTimeSlotId(req, res));
 
             // Discipline Handler
             post("/discipline", (req, res) -> DisciplineHandler.createDiscipline(req, res));

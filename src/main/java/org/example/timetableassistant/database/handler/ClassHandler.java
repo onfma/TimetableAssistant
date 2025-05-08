@@ -86,6 +86,27 @@ public class ClassHandler {
         }
     }
 
+    public static String getClassesByTimeSlotId(Request req, Response res) {
+        int time_slot_id = Integer.parseInt(req.params(":time_slot_id"));
+
+        OperationResult result = classCRUD.getClassesByTimeSlotId(time_slot_id);
+
+        Gson gson = new Gson();
+
+        if (result.success) {
+            res.status(200);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message);
+            return gson.toJson(response);
+        } else {
+            res.status(404);
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
+
+
     public static String updateClass(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         int disciplineId = Integer.parseInt(req.queryParams("discipline_id"));
