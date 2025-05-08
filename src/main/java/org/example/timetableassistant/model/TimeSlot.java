@@ -1,10 +1,10 @@
 package org.example.timetableassistant.model;
 
 public class TimeSlot {
-    private int id;
-    private String dayOfWeek;
-    private String startTime;
-    private String endTime;
+    private final int id;
+    private final String dayOfWeek;
+    private final String startTime;
+    private final String endTime;
 
     public TimeSlot(int id, String dayOfWeek, String startTime, String endTime) {
         this.id = id;
