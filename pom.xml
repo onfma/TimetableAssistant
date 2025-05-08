@@ -11,7 +11,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>5.10.2</junit.version>  </properties>
+    <junit.version>5.10.2</junit.version>
+    <karate.version>1.4.1</karate.version>
+  </properties>
+
 
   <dependencies>
     <dependency>
@@ -133,6 +136,13 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20210307</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.intuit.karate</groupId>
+      <artifactId>karate-junit5</artifactId>
+      <version>${karate.version}</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
