@@ -60,14 +60,6 @@ public class DatabaseSetup {
                 );
             """;
 
-            String createStudents = """
-                CREATE TABLE IF NOT EXISTS students (
-                    id SERIAL PRIMARY KEY,
-                    name VARCHAR(100) NOT NULL,
-                    group_id INT REFERENCES groups(id)
-                );
-            """;
-
             String createTeachers = """
                 CREATE TABLE IF NOT EXISTS teachers (
                     id SERIAL PRIMARY KEY,
@@ -151,7 +143,6 @@ public class DatabaseSetup {
 
             stmt.execute(createSemiYears);
             stmt.execute(createGroups);
-            stmt.execute(createStudents);
             stmt.execute(createTeachers);
             stmt.execute(createDisciplines);
             stmt.execute(createClassTypes);

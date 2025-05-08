@@ -58,14 +58,6 @@ public class DatabaseServer {
             put("/room/:id", (req, res) -> RoomHandler.updateRoom(req, res));
             delete("/room/:id", (req, res) -> RoomHandler.deleteRoom(req, res));
 
-            // Student Handler
-            post("/student", (req, res) -> StudentHandler.createStudent(req, res));
-            get("/student/get-all", (req, res) -> StudentHandler.getAllStudents(req, res));
-            get("/student/get-by-id/:id", (req, res) -> StudentHandler.getStudentById(req, res));
-            get("/student/get-by-group-id/:group_id", (req, res) -> StudentHandler.getStudentsByGroupId(req, res));
-            put("/student/:id", (req, res) -> StudentHandler.updateStudent(req, res));
-            delete("/student/:id", (req, res) -> StudentHandler.deleteStudent(req, res));
-
             // Teacher Handler
             post("/teacher", (req, res) -> TeacherHandler.createTeacher(req, res));
             get("/teacher/get-all", (req, res) -> TeacherHandler.getAllTeachers(req, res));
