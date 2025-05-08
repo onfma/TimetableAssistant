@@ -71,7 +71,7 @@ public class DisciplineAllocationService {
     }
 
     public static List<DisciplineAllocation> getByTeacherId(int id) throws Exception {
-        URL url = new URI(BASE_URL + "s/get-by-teacher-id/" + id).toURL();
+        URL url = new URI(BASE_URL + "/get-by-teacher-id/" + id).toURL();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
