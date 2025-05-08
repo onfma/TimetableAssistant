@@ -20,6 +20,8 @@ public class ClassService {
     private static final String BASE_URL = "http://localhost:4567/db/class";
 
     public static String createClass(int disciplineId, ClassType classType, int roomId, int timeSlotId, Semiyear semiyear, Integer groupId, int teacherId) throws Exception {
+        AssistantService.verifyClassCreation(roomId, timeSlotId, semiyear, groupId, teacherId);
+
         if (classType == classType.COURSE){
             groupId = null;
         } else{
@@ -121,5 +123,9 @@ public class ClassService {
         } else {
             throw new Exception("Failed to delete class. HTTP error code: " + responseCode);
         }
+    }
+
+    public static List<Class> getByTimeSlotId(int timeSlotId){
+        return new ArrayList<>();
     }
 }
