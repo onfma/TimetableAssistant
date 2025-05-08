@@ -36,4 +36,9 @@ public class Teacher {
         }
         return disciplines;
     }
+
+    @Override
+    public String toString() {
+        return this.getName(); // or whatever method returns the teacher's name
+    }
 }

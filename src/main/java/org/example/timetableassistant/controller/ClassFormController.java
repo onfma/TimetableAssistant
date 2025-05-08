@@ -29,16 +29,22 @@ public class ClassFormController {
 
     public Class getClassEntry() {
         Group group = groupComboBox.getValue();
+        Discipline discipline = disciplineComboBox.getValue();
+        Teacher teacher = teacherComboBox.getValue();
+        Room room = roomComboBox.getValue();
+        TimeSlot timeSlot = timeSlotComboBox.getValue();
+        String classTypeStr = classTypeComboBox.getValue();
         Semiyear semiyear = entryToEdit != null ? entryToEdit.getSemiyear() : Semiyear.SEM_1A;
+
         return new Class(
                 entryToEdit != null ? entryToEdit.getClassId() : null,
-                disciplineComboBox.getValue().getId(),
-                ClassType.valueOf(classTypeComboBox.getValue()),
-                roomComboBox.getValue().getId(),
-                timeSlotComboBox.getValue().getId(),
+                discipline != null ? discipline.getId() : null,
+                classTypeStr != null ? getClassTypeFromString(classTypeStr) : null,
+                room != null ? room.getId() : null,
+                timeSlot != null ? timeSlot.getId() : null,
                 group != null ? group.getId() : null,
                 semiyear,
-                teacherComboBox.getValue().getId()
+                teacher != null ? teacher.getId() : null
         );
     }
 
@@ -58,6 +64,19 @@ public class ClassFormController {
                     .orElse(null);
             timeSlotComboBox.setValue(selectedSlot);
             classTypeComboBox.setValue(entry.getClassType().name());
+        }
+    }
+
+    private ClassType getClassTypeFromString(String type) {
+        switch (type) {
+            case "Curs":
+                return ClassType.COURSE;
+            case "Seminar":
+                return ClassType.SEMINAR;
+            case "Laborator":
+                return ClassType.LABORATORY;
+            default:
+                throw new IllegalArgumentException("Unknown class type: " + type);
         }
     }
 
@@ -88,9 +107,20 @@ public class ClassFormController {
                 }
 
                 if (entryToEdit == null) {
+                    System.out.println("########################################################");
+                    System.out.println("########################################################");
+                    System.out.println("disciplineId: " + discipline.getId());
+                    System.out.println("classType: " + getClassTypeFromString(classTypeStr));
+                    System.out.println("roomId: " + room.getId());
+                    System.out.println("timeSlotId: " + timeSlot.getId());
+                    System.out.println("semiyear: " + semiyear);
+                    System.out.println("groupId: " + group.getId());
+                    System.out.println("teacherId: " + teacher.getId());
+                    System.out.println("########################################################");
+                    System.out.println("########################################################");
                     String response = ClassService.createClass(
                             discipline.getId(),
-                            ClassType.valueOf(classTypeStr),
+                            getClassTypeFromString(classTypeStr),
                             room.getId(),
                             timeSlot.getId(),
                             semiyear,
@@ -102,7 +132,7 @@ public class ClassFormController {
                     String response = ClassService.updateClass(
                             entryToEdit.getClassId(),
                             discipline.getId(),
-                            ClassType.valueOf(classTypeStr),
+                            getClassTypeFromString(classTypeStr),
                             room.getId(),
                             timeSlot.getId(),
                             semiyear,

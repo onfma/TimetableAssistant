@@ -19,7 +19,7 @@
         <ComboBox fx:id="filterValueComboBox" promptText="Selectează valoarea" HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <TableView fx:id="scheduleTable" prefHeight="400">
+    <TableView fx:id="classTable" prefHeight="400">
         <columns>
             <TableColumn fx:id="dayColumn" text="Ziua" prefWidth="80"/>
             <TableColumn fx:id="timeColumn" text="Interval" prefWidth="100"/>

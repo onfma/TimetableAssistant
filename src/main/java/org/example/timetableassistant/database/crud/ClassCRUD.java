@@ -37,8 +37,16 @@ public class ClassCRUD {
             stmt.setInt(3, roomId);
             stmt.setInt(4, timeSlotId);
             stmt.setInt(5, teacherId);
-            stmt.setObject(6, semiyear != null ? semiyear.getValue() : null, Types.VARCHAR); // Allowing null for semiyearId
-            stmt.setObject(7, groupId, Types.INTEGER);   // Allowing null for groupId
+            if (semiyear != null) {
+                stmt.setObject(6, semiyear.name(), Types.OTHER); // Use enum name and Types.OTHER for PostgreSQL enum
+            } else {
+                stmt.setNull(6, Types.OTHER);
+            }
+            if (groupId != null) {
+                stmt.setInt(7, groupId);
+            } else {
+                stmt.setNull(7, Types.INTEGER);
+            }
             stmt.executeUpdate();
             return new OperationResult(true, "Clasa a fost adăugată cu succes.");
         } catch (SQLException e) {

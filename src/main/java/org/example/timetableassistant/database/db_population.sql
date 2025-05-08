@@ -1,3 +1,7 @@
+INSERT INTO class_types (id, name) VALUES (1, 'COURSE') ON CONFLICT DO NOTHING;
+INSERT INTO class_types (id, name) VALUES (2, 'LABORATORY') ON CONFLICT DO NOTHING;
+INSERT INTO class_types (id, name) VALUES (3, 'SEMINAR') ON CONFLICT DO NOTHING;
+
 INSERT INTO teachers (name)
 VALUES
     ('Alboaie Lenuța'),

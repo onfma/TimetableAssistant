@@ -21,7 +21,7 @@ public class ClassHandler {
         // Valori opționale
         String semiyearStr = req.queryParams("semiyear");
         Semiyear semiyear = null;
-        if (semiyearStr != null) {
+        if (semiyearStr != null && !semiyearStr.isEmpty()) {
             try{
                 semiyear = Semiyear.valueOf(semiyearStr);
             } catch(Exception e){
@@ -29,8 +29,10 @@ public class ClassHandler {
                 return "{\"error\":\"Invalid semiyear value: " + semiyearStr + "\"}";
             }
         }
-        Integer groupId = req.queryParams("group_id") != null ? Integer.parseInt(req.queryParams("group_id")) : null;
-
+        Integer groupId = (req.queryParams("group_id") != null && !req.queryParams("group_id").isEmpty())
+                    ? Integer.parseInt(req.queryParams("group_id"))
+                    : null;
+        
         if (disciplineId == 0 || classTypeString == null || roomId == 0 || timeSlotId == 0 || teacherId == 0) {
             res.status(400);
             return "Missing required fields.";

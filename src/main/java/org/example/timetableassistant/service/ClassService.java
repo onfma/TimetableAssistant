@@ -20,6 +20,12 @@ public class ClassService {
     private static final String BASE_URL = "http://localhost:4567/db/class";
 
     public static String createClass(int disciplineId, ClassType classType, int roomId, int timeSlotId, Semiyear semiyear, Integer groupId, int teacherId) throws Exception {
+        if (classType == classType.COURSE){
+            groupId = null;
+        } else{
+            semiyear = null;
+        }
+
         String query = String.format("?discipline_id=%d&class_type=%s&room_id=%d&time_slot_id=%d&teacher_id=%d",
                 disciplineId, URLEncoder.encode(classType.name(), "UTF-8"), roomId, timeSlotId, teacherId);
         if ( semiyear != null ) {

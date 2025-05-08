@@ -18,4 +18,9 @@ public class Discipline {
 
     public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
+
+    @Override
+    public String toString() {
+        return this.getName(); // or whatever method returns the teacher's name
+    }
 }
