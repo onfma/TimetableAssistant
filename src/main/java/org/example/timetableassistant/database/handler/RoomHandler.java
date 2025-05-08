@@ -44,13 +44,29 @@ public class RoomHandler {
         if (result.success) {
             res.status(200);
             response.put("message", result.message);
-            return gson.toJson(response);
         } else {
             res.status(404);
             response.put("error", result.message);
-            return gson.toJson(response);
         }
+        return gson.toJson(response);
     }
+
+    public static String getAllRooms(Request req, Response res) {
+        OperationResult result = roomCRUD.getAllRooms();
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+        return gson.toJson(response);
+    }
+
 
     public static String updateRoom(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));

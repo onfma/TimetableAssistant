@@ -62,6 +62,25 @@ public class TimeSlotHandler {
         }
     }
 
+
+    public static String getAllTimeSlots(Request req, Response res) {
+        OperationResult result = timeSlotCRUD.getAllTimeSlots();
+        Gson gson = new Gson();
+
+        if (result.success) {
+            res.status(200);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message); // lăsăm ca obiect
+            return gson.toJson(response);
+        } else {
+            res.status(404);
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
+
+
     public static String updateTimeSlot(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         String newDayOfWeek = req.queryParams("day_of_week");

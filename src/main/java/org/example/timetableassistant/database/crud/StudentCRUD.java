@@ -3,7 +3,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StudentCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -43,6 +46,34 @@ public class StudentCRUD {
             return new OperationResult(false, "Eroare la obținerea studentului: " + e.getMessage());
         }
     }
+
+    public OperationResult getAllStudents() {
+        String query = "SELECT s.id, s.name, s.group_id FROM students s";
+        List<Map<String, Object>> students = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("name", rs.getString("name"));
+                data.put("group_id", rs.getInt("group_id"));
+                students.add(data);
+            }
+
+            if (students.isEmpty()) {
+                return new OperationResult(false, "Nu există studenți în baza de date.");
+            }
+
+            return new OperationResult(true, students);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea studenților: " + e.getMessage());
+        }
+    }
+
 
     public OperationResult updateStudent(int id, String newName, int newGroupId) {
         String query = "UPDATE students SET name = ?, group_id = ? WHERE id = ?";

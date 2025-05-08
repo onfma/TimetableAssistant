@@ -154,6 +154,26 @@ public class ClassHandler {
         }
     }
 
+    public static String getClassesByTimeSlotId(Request req, Response res) {
+        int time_slot_id = Integer.parseInt(req.params(":time_slot_id"));
+
+        OperationResult result = classCRUD.getClassesByTimeSlotId(time_slot_id);
+
+        Gson gson = new Gson();
+
+        if (result.success) {
+            res.status(200);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message);
+            return gson.toJson(response);
+        } else {
+            res.status(404);
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
+
     public static String getClassesByRoomId(Request req, Response res) {
         int roomId = Integer.parseInt(req.params(":roomId"));
 
@@ -212,5 +232,50 @@ public class ClassHandler {
             response.put("error", result.message);
             return gson.toJson(response);
         }
+    }
+
+
+    public static String getClassesByDisciplineId(Request req, Response res) {
+        int disciplineId;
+
+        try {
+            disciplineId = Integer.parseInt(req.params(":disciplineId"));
+        } catch (NumberFormatException e) {
+            res.status(400);
+            return "{\"error\":\"ID invalid pentru disciplină.\"}";
+        }
+
+        OperationResult result = classCRUD.getClassesByDisciplineId(disciplineId);
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
+
+    public static String getAllClasses(Request req, Response res) {
+        OperationResult result = classCRUD.getAllClasses();
+
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
     }
 }

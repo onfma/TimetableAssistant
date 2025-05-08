@@ -49,7 +49,14 @@ public class RoomsViewController {
         typeComboBox.getItems().addAll("curs", "laborator");
         typeComboBox.setPromptText("Selectați tipul");
 
-        vbox.getChildren().addAll(new Label("Nume sală:"), nameField, new Label("Tip sală:"), typeComboBox);
+        TextField capacityField = new TextField();
+        capacityField.setPromptText("Capacitate");
+
+        vbox.getChildren().addAll(
+            new Label("Nume sală:"), nameField, 
+            new Label("Tip sală:"), typeComboBox,
+            new Label("Capacitate:"), capacityField
+        );
 
         dialog.getDialogPane().setContent(vbox);
 
@@ -61,14 +68,28 @@ public class RoomsViewController {
             if (buttonType == okButton) {
                 String name = nameField.getText();
                 String type = typeComboBox.getValue();
-                Room newRoom = new Room(rooms.size() + 1, name, type);
-                return newRoom;
+                String capacityText = capacityField.getText();
+                int capacity;
+                try {
+                    capacity = Integer.parseInt(capacityText);
+                    org.example.timetableassistant.service.RoomService.createRoom(name, capacity, type);
+                    Room newRoom = new Room(rooms.size() + 1, name, type);
+                    return newRoom;
+                } catch (NumberFormatException nfe) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Capacitatea trebuie să fie un număr întreg.");
+                    errorAlert.showAndWait();
+                } catch (Exception ex) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Eroare la adăugarea sălii: " + ex.getMessage());
+                    errorAlert.showAndWait();
+                }
             }
             return null;
         });
 
         dialog.showAndWait().ifPresent(Room -> {
-            rooms.add(Room);
+            if (Room != null) {
+                rooms.add(Room);
+            }
         });
     }
 

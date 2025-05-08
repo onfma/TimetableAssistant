@@ -4,7 +4,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RoomTypesCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -78,4 +81,29 @@ public class RoomTypesCRUD {
             return new OperationResult(false, "Eroare la ștergerea tipului de sală: " + e.getMessage());
         }
     }
+
+    public OperationResult getAllRoomTypes() {
+        String query = "SELECT * FROM room_types";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            List<Map<String, Object>> roomTypes = new ArrayList<>();
+            while (rs.next()) {
+                Map<String, Object> roomType = new HashMap<>();
+                roomType.put("id", rs.getInt("id"));
+                roomType.put("name", rs.getString("name"));
+                roomTypes.add(roomType);
+            }
+
+            if (roomTypes.isEmpty()) {
+                return new OperationResult(false, "Nu există tipuri de săli înregistrate.");
+            }
+
+            return new OperationResult(true, roomTypes);
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea tipurilor de săli: " + e.getMessage());
+        }
+    }
+
 }

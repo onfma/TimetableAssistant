@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.VBox;
 import org.example.timetableassistant.model.Discipline;
+import org.example.timetableassistant.service.DisciplineService;
 
 public class DisciplinesViewController {
 
@@ -60,8 +61,15 @@ public class DisciplinesViewController {
             if (buttonType == okButton) {
                 String name = nameField.getText();
                 String type = typeComboBox.getValue();
-                Discipline newDiscipline = new Discipline(disciplines.size() + 1, name, type);
-                return newDiscipline;
+                int teacherId = 1;
+                try {
+                    DisciplineService.createDiscipline(name, teacherId);
+                    Discipline newDiscipline = new Discipline(disciplines.size() + 1, name, type);
+                    return newDiscipline;
+                } catch (Exception ex) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Eroare la crearea disciplinei: " + ex.getMessage());
+                    alert.showAndWait();
+                }
             }
             return null;
         });

@@ -52,6 +52,26 @@ public class DisciplineHandler {
         }
     }
 
+
+    public static String getAllDisciplines(Request req, Response res) {
+        OperationResult result = disciplineCRUD.getAllDisciplines();
+
+        Gson gson = new Gson();
+        if (result.success) {
+            res.status(200);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message);
+            return gson.toJson(response);
+        } else {
+            res.status(404);
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
+
+
+
     public static String updateDiscipline(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));
         String newName = req.queryParams("name");

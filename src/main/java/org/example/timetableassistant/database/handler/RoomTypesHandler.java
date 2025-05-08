@@ -89,6 +89,22 @@ public class RoomTypesHandler {
         }
     }
 
+    public static String getAllRoomTypes(Request req, Response res) {
+        OperationResult result = roomTypeCRUD.getAllRoomTypes();
+        Gson gson = new Gson();
+
+        if (result.success) {
+            res.status(200);  // OK
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", result.message);
+            return gson.toJson(response);
+        } else {
+            res.status(404);  // Not Found
+            Map<String, Object> response = new HashMap<>();
+            response.put("error", result.message);
+            return gson.toJson(response);
+        }
+    }
 
 
 }

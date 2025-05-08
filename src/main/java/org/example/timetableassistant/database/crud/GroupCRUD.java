@@ -5,7 +5,10 @@ import org.example.timetableassistant.database.DatabaseConfig;
 import org.example.timetableassistant.database.OperationResult;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GroupCRUD {
     private static final String URL = DatabaseConfig.getUrl();
@@ -65,6 +68,34 @@ public class GroupCRUD {
             return new OperationResult(false, "Eroare la obținerea grupei: " + e.getMessage());
         }
     }
+
+    public OperationResult getAllGroups() {
+        String query = "SELECT * FROM groups";
+        List<Map<String, Object>> groups = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("id", rs.getInt("id"));
+                data.put("name", rs.getString("name"));
+                data.put("semiyear_id", rs.getInt("semiyear_id"));
+                groups.add(data);
+            }
+
+            if (groups.isEmpty()) {
+                return new OperationResult(false, "Nu există grupe înregistrate.");
+            }
+
+            return new OperationResult(true, groups);
+
+        } catch (SQLException e) {
+            return new OperationResult(false, "Eroare la obținerea grupelor: " + e.getMessage());
+        }
+    }
+
 
 
     public OperationResult updateGroup(int id, String newName, int newSemiyearId) {

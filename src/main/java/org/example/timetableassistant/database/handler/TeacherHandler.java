@@ -48,6 +48,22 @@ public class TeacherHandler {
         }
     }
 
+    public static String getAllTeachers(Request req, Response res) {
+        OperationResult result = teacherCRUD.getAllTeachers();
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);
+            response.put("message", result.message);
+        } else {
+            res.status(404);
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
 
     public static String updateTeacher(Request req, Response res) {
         int id = Integer.parseInt(req.params(":id"));

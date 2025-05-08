@@ -65,6 +65,24 @@ public class SemiyearHandler {
         }
     }
 
+    public static String getAllSemiyears(Request req, Response res) {
+        OperationResult result = semiyearsCRUD.getAllSemiyears();
+        Gson gson = new Gson();
+        Map<String, Object> response = new HashMap<>();
+
+        if (result.success) {
+            res.status(200);  // OK
+            response.put("message", result.message);
+        } else {
+            res.status(404);  // Not Found
+            response.put("error", result.message);
+        }
+
+        return gson.toJson(response);
+    }
+
+
+
     public static String getSemiyearByNameAndYear(Request req, Response res) {
         String name = req.queryParams("name");
         String yearParam = req.queryParams("study_year");
