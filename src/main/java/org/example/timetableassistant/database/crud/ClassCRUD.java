@@ -165,7 +165,6 @@ public class ClassCRUD {
         }
     }
 
-    // Get all classes for a specific group
     public OperationResult getClassesByGroupId(int groupId) {
         String query = "SELECT * FROM classes WHERE group_id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -194,7 +193,6 @@ public class ClassCRUD {
             return new OperationResult(false, "Eroare la obținerea claselor pentru grupul cu ID-ul " + groupId + ": " + e.getMessage());
         }
     }
-
 
     public OperationResult getClassesByRoomId(int roomId) {
         String query = "SELECT * FROM classes WHERE room_id = ?";
@@ -254,7 +252,6 @@ public class ClassCRUD {
         }
     }
 
-    // Get all classes for a specific teacher
     public OperationResult getClassesByTeacherId(int teacherId) {
         String query = "SELECT * FROM classes WHERE teacher_id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
