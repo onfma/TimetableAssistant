@@ -17,6 +17,14 @@
 
 
   <dependencies>
+
+    <!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-suite-api -->
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite-api</artifactId>
+      <version>1.13.0-RC1</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
@@ -56,14 +64,14 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit.version}</version>
+      <version>5.11.3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.version}</version>
+      <version>5.11.3</version>
       <scope>test</scope>
     </dependency>
 
