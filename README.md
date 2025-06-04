@@ -1,37 +1,8 @@
-# Timetable Assistant
+# Timetable Assistant - CRUD Unit Tests
 
-This is the documentation for the Timetable Assistant application, including an overview of the project, its structure, and how to run the application.
+This directory contains unit tests for the CRUD (Create, Read, Update, Delete) operations of the Timetable Assistant application. The tests use JUnit 5 and Mockito to mock database interactions and verify the behavior of each CRUD class.
 
-
-
-## Table of Contents
-
-- [Program Design & Implementation](#program-design--implementation)
-- [User Manual](#user-manual)
-- [Unit Tests Coverage](#unit-tests-coverage)
-- [Use of Assertions](#use-of-assertions)
-- [Credits](#credits)
-
-
-
-## Program Design & Implementation
-
-text text text
-
-
-
-## User Manual
-
-text text text
-
-
-
-## Unit Tests Coverage
-
-This part covers the unit tests for the CRUD (Create, Read, Update, Delete) operations of the Timetable Assistant application. 
-The tests use JUnit 5 and Mockito to mock database interactions and verify the behavior of each CRUD class.
-
-### Covered Entities and Operations
+## Covered Entities and Operations
 
 - **DisciplineCRUD**
     - Insert, get by ID, update, delete, get all disciplines
@@ -65,7 +36,7 @@ The tests use JUnit 5 and Mockito to mock database interactions and verify the b
     - Get classes by group ID, room ID, semiyear, teacher ID, discipline ID: success, no results, SQL exceptions
     - Get all classes: success (multiple results), no results, SQL exceptions
 
-### Testing Approach
+## Testing Approach
 
 - All tests use Mockito to mock JDBC connections, statements, and result sets.
 - Each CRUD method is tested for:
@@ -73,21 +44,3 @@ The tests use JUnit 5 and Mockito to mock database interactions and verify the b
     - Handling of not found records
     - SQL exceptions and error messages
 - Assertions verify both the operation result and the correctness of returned data or error messages.
-
-
-
-## Use of Assertions
-
-text text text
-
-
-
-## Credits
-
-* Aron Robert
-* Chichirau Claudiu
-* Dulhac Alexandru
-* Onofrei Maria
-
-_Quality of Software Systems Project 
-[Masters Year 1 - 2025]_
