@@ -194,9 +194,15 @@ The tests use JUnit 5 and Mockito to mock database interactions and verify the b
 
 ## Use of Assertions
 
-text text text
+Assertions have been used for checking most preconditions / postconditions / loops of the methods of classes beloging these class archetypes:
+- Service
+- Handler
+- CRUD
+- Model
 
-
+For Model classes, an additional "assertCurrentState" method has been added for checking the validity of the current state. 
+The method "assertCurrentState" is called inside other state-changing methods.
+All asserts check if variables are null / strings are empty / ids are less or equal to 0
 
 ## Credits
 
