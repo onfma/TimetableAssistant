@@ -39,7 +39,7 @@ public class DatabaseServer {
             post("/discipline-allocation", (req, res) -> DisciplineAllocationHandler.createDisciplineAllocation(req, res));
             get("/discipline-allocation/get-all", (req, res) -> DisciplineAllocationHandler.getAllDisciplineAllocations(req, res));
             get("/discipline-allocation/get-by-discipline-id/:id", DisciplineAllocationHandler::getAllDisciplineAllocationsByDisciplineId);
-            get("/discipline-allocations/get-by-teacher-id/:id", DisciplineAllocationHandler::getAllDisciplineAllocationsByTeacherId);
+            get("/discipline-allocation/get-by-teacher-id/:id", DisciplineAllocationHandler::getAllDisciplineAllocationsByTeacherId);
             get("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.getDisciplineAllocationById(req, res));
             put("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.updateDisciplineAllocation(req, res));
             delete("/discipline-allocation/:id", (req, res) -> DisciplineAllocationHandler.deleteDisciplineAllocation(req, res));
@@ -57,14 +57,6 @@ public class DatabaseServer {
             get("/room/:id", (req, res) -> RoomHandler.getRoomById(req, res));
             put("/room/:id", (req, res) -> RoomHandler.updateRoom(req, res));
             delete("/room/:id", (req, res) -> RoomHandler.deleteRoom(req, res));
-
-            // Student Handler
-            post("/student", (req, res) -> StudentHandler.createStudent(req, res));
-            get("/student/get-all", (req, res) -> StudentHandler.getAllStudents(req, res));
-            get("/student/get-by-id/:id", (req, res) -> StudentHandler.getStudentById(req, res));
-            get("/student/get-by-group-id/:group_id", (req, res) -> StudentHandler.getStudentsByGroupId(req, res));
-            put("/student/:id", (req, res) -> StudentHandler.updateStudent(req, res));
-            delete("/student/:id", (req, res) -> StudentHandler.deleteStudent(req, res));
 
             // Teacher Handler
             post("/teacher", (req, res) -> TeacherHandler.createTeacher(req, res));
