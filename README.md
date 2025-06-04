@@ -64,9 +64,83 @@ The system follows a modular architecture, with each entity managed through its 
 
 ## User Manual
 
-text text text
+### Purpose of the application
 
+The purpose of this program is to help universities create class schedules. It offers a graphical user interface for controlling seminars, laboratories, and lectures. The application looks for schedule irregularities and conflicts, like sessions that overlap or room.
 
+---
+
+### Starting the application
+
+Use IntelliJ IDEA to launch the application:
+1. Launch IntelliJ IDEA and open the project.
+2. Using the directory \src\main\java\org\example\timetableassistant\MainApp.java, open the MainApp.java file.
+3. To start the software, click the Run button, which is typically represented by a green triangle icon.
+
+---
+
+### Structure of the application
+
+Six primary components make up the program interface, which is accessed via a sidebar. Each section offers tools for adding, updating, and removing records and is devoted to handling a particular kind of data
+
+#### 1. Groups of Students
+
+- Shows the group number and related year for each student group that is presently stored in the database.  
+- Users have the ability to add, modify, and remove groups.
+
+#### 2. Teachers
+
+- Provides a list of all teachers and the disciplines they instruct.  
+- Indicates if they are in charge of seminars, labs, or lectures.  
+- Teachers can be added, edited, or removed by users.  
+ - Users can also add or remove subjects linked to individual professors.
+
+#### 3. Subjects
+
+ - Lists every subject that is available.  
+ - Subjects can be deleted, edited, or added by users.
+
+#### 4. Classrooms
+
+ - Shows the names and classifications of every classroom (e.g., lecture hall, lab room).  
+ - Classrooms can be added, edited, or deleted by users.
+
+#### 5. Timetable
+
+ - All of the scheduled classes are listed in this main area.  
+ - The schedule can be filtered by subject, lecturer, classroom, or student group.  
+ - By completing a form with the following information, users can add new classes or modify existing ones:  
+   - Group of students  
+   - Subject: Instructor in the Classroom  
+   - Duration of time  
+    - Class type (lecture, lab, or seminar)  
+- The application looks for scheduling conflicts when trying to save a class and shows a warning if any are found. Classes that are in conflict won't be saved.
+
+#### 6. Export Timetable
+
+ - Schedules can be exported to.html files by users.  
+ - Timetables for classes, subjects, professors, and student groups are among the export choices.  
+ - For a clear and easy-to-use perspective, the exported files can be opened in any web browser after being saved locally.
+
+---
+
+### Validation of Conflicts and Error Messages
+
+The application automatically checks for scheduling conflicts when adding or changing a class:
+
+- **Room Conflict**
+  - Alert: "Conflict with existing class in the same room at the same time."  
+  - If there is another class booked in the same room at the designated time, it gets triggered.
+
+- **Teacher Conflict**
+   - Alert: "Conflict with existing class for the same teacher at the same time."  
+  - Triggered in the event that the instructor is concurrently assigned to another class.
+
+- **Group Conflict**
+   - Alert: "Conflict with existing class for the same group at the same time."  
+  - If the student group has another class planned at the same time, it will be triggered.
+
+In every instance, the user is notified of the particular problem and the conflicting class cannot be stored.
 
 ## Unit Tests Coverage
 
