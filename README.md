@@ -213,7 +213,7 @@ All asserts check if variables are null / strings are empty / ids are less or eq
 
 ## Credits
 
-* Aron Robert()
+* Aron Robert(Contributions: App interface design, service layer enhancements, unit tests for group and class modules, and project documentation.)
 * Chichirau Claudiu
 * Dulhac Alexandru
 * Onofrei Maria
