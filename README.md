@@ -107,20 +107,27 @@ Six primary components make up the program interface, which is accessed via a si
 
 #### 5. Timetable
 
- - All of the scheduled classes are listed in this main area.  
+ - All of the scheduled classes are listed in this main area.(example in **Figure 1**)
+![Schedule view](images/schedule.png)
+*Figure 1: Page for schedule manipulation*  
  - The schedule can be filtered by subject, lecturer, classroom, or student group.  
- - By completing a form with the following information, users can add new classes or modify existing ones:  
+ - To add a new class, users can press the specific button("Adauga clasa"), in which they can complete a form with the following information(example in **Figure 2**):  
    - Group of students  
    - Subject: Instructor in the Classroom  
    - Duration of time  
-    - Class type (lecture, lab, or seminar)  
-- The application looks for scheduling conflicts when trying to save a class and shows a warning if any are found. Classes that are in conflict won't be saved.
+    - Class type (lecture, lab, or seminar)
+![Class creation](images/form-schedule.png)
+*Figure 2: Add new class form*
+- The same form is used for editing one selected class that is present in the schedule.
+- The application looks for scheduling conflicts when trying to save a class and shows a warning if any are found. Classes that are in conflict won't be saved. The warnings are explained in **Validation of Conflicts and Error Messages** subchapter.
 
 #### 6. Export Timetable
 
  - Schedules can be exported to.html files by users.  
  - Timetables for classes, subjects, professors, and student groups are among the export choices.  
  - For a clear and easy-to-use perspective, the exported files can be opened in any web browser after being saved locally.
+![HTML page for exported schedule](images/export.png)
+*Figure 3: Example of html page containing the schedule of one teacher*
 
 ---
 
@@ -206,7 +213,7 @@ All asserts check if variables are null / strings are empty / ids are less or eq
 
 ## Credits
 
-* Aron Robert
+* Aron Robert()
 * Chichirau Claudiu
 * Dulhac Alexandru
 * Onofrei Maria
