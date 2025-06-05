@@ -116,7 +116,7 @@ Six primary components make up the program interface, which is accessed via a si
    - Subject: Instructor in the Classroom  
    - Duration of time  
     - Class type (lecture, lab, or seminar)
-![Class creation](images/form-schedule.png)
+![Class creation](images/form_schedule.png)
 *Figure 2: Add new class form*
 - The same form is used for editing one selected class that is present in the schedule.
 - The application looks for scheduling conflicts when trying to save a class and shows a warning if any are found. Classes that are in conflict won't be saved. The warnings are explained in **Validation of Conflicts and Error Messages** subchapter.
